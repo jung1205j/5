@@ -1,0 +1,202 @@
+[
+  {
+    "group": "20대이하_학생",
+    "interest": 1,
+    "share": 1,
+    "reason_type": "가격",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "에타"
+    ]
+  },
+  {
+    "group": "20대이하_직장인",
+    "interest": 4,
+    "share": 3,
+    "reason_type": "거리",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "맘카페"
+    ]
+  },
+  {
+    "group": "20대이하_주부",
+    "interest": 2,
+    "share": 5,
+    "reason_type": "분위기",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "당근"
+    ]
+  },
+  {
+    "group": "20대이하_자영업",
+    "interest": 5,
+    "share": 2,
+    "reason_type": "메뉴",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "20대이하_기타",
+    "interest": 3,
+    "share": 4,
+    "reason_type": "관심없음",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "없음"
+    ]
+  },
+  {
+    "group": "30대_학생",
+    "interest": 1,
+    "share": 1,
+    "reason_type": "가격",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "에타"
+    ]
+  },
+  {
+    "group": "30대_직장인",
+    "interest": 4,
+    "share": 3,
+    "reason_type": "거리",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "맘카페"
+    ]
+  },
+  {
+    "group": "30대_주부",
+    "interest": 2,
+    "share": 5,
+    "reason_type": "분위기",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "당근"
+    ]
+  },
+  {
+    "group": "30대_자영업",
+    "interest": 5,
+    "share": 2,
+    "reason_type": "메뉴",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "30대_기타",
+    "interest": 3,
+    "share": 4,
+    "reason_type": "관심없음",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "없음"
+    ]
+  },
+  {
+    "group": "40대_학생",
+    "interest": 1,
+    "share": 1,
+    "reason_type": "가격",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "에타"
+    ]
+  },
+  {
+    "group": "40대_직장인",
+    "interest": 4,
+    "share": 3,
+    "reason_type": "거리",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "맘카페"
+    ]
+  },
+  {
+    "group": "40대_주부",
+    "interest": 2,
+    "share": 5,
+    "reason_type": "분위기",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "당근"
+    ]
+  },
+  {
+    "group": "40대_자영업",
+    "interest": 5,
+    "share": 2,
+    "reason_type": "메뉴",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "40대_기타",
+    "interest": 3,
+    "share": 4,
+    "reason_type": "관심없음",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "없음"
+    ]
+  },
+  {
+    "group": "50대이상_학생",
+    "interest": 1,
+    "share": 1,
+    "reason_type": "가격",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "에타"
+    ]
+  },
+  {
+    "group": "50대이상_직장인",
+    "interest": 4,
+    "share": 3,
+    "reason_type": "거리",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "맘카페"
+    ]
+  },
+  {
+    "group": "50대이상_주부",
+    "interest": 2,
+    "share": 5,
+    "reason_type": "분위기",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "당근"
+    ]
+  },
+  {
+    "group": "50대이상_자영업",
+    "interest": 5,
+    "share": 2,
+    "reason_type": "메뉴",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "50대이상_기타",
+    "interest": 3,
+    "share": 4,
+    "reason_type": "관심없음",
+    "reason_text": "테스트용 가상의 설문 문장",
+    "community": [
+      "없음"
+    ]
+  }
+]
