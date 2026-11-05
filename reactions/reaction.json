@@ -1,6 +1,6 @@
 [
   {
-    "group": "20대_학생",
+    "group": "20대이하_학생",
     "interest": 4,
     "share": 3,
     "reason_type": "가격",
@@ -11,7 +11,7 @@
     ]
   },
   {
-    "group": "20대_직장인",
+    "group": "20대이하_직장인",
     "interest": 4,
     "share": 4,
     "reason_type": "거리",
@@ -22,7 +22,7 @@
     ]
   },
   {
-    "group": "20대_주부",
+    "group": "20대이하_주부",
     "interest": 3,
     "share": 3,
     "reason_type": "분위기",
@@ -33,7 +33,7 @@
     ]
   },
   {
-    "group": "20대_자영업",
+    "group": "20대이하_자영업",
     "interest": 3,
     "share": 2,
     "reason_type": "시간",
@@ -44,7 +44,7 @@
     ]
   },
   {
-    "group": "20대_기타",
+    "group": "20대이하_기타",
     "interest": 3,
     "share": 3,
     "reason_type": "관심없음",
@@ -68,8 +68,8 @@
     "group": "30대_직장인",
     "interest": 4,
     "share": 4,
-    "reason_type": "거리",
-    "reason_text": "직장이나 집에서 가까우면 동료에게도 추천할 수 있을 것 같다",
+    "reason_type": "기타",
+    "reason_text": "카페 내에서도 일회용 용기를 내줘서 가기가 꺼려진다.",
     "community": [
       "인스타",
       "당근"
@@ -93,8 +93,7 @@
     "share": 3,
     "reason_type": "시간",
     "reason_text": "가게 운영 시간과 겹쳐 자주 방문하기는 어려울 것 같다",
-    "community": [    
-        "당근",
+    "community": [ "당근",
       "인스타"
     ]
   },
@@ -116,8 +115,7 @@
     "reason_type": "거리",
     "reason_text": "현재 생활 반경에서 멀면 일부러 찾아가지는 않을 것 같다",
     "community": [
-      "인스타",
-      "없음"
+      "인스타"
     ]
   },
   {
@@ -149,8 +147,7 @@
     "reason_type": "시간",
     "reason_text": "일하는 시간이 길어 카페를 이용할 기회가 많지 않다",
     "community": [
-      "당근",
-      "없음"
+      "당근"
     ]
   },
   {
@@ -171,8 +168,7 @@
     "reason_type": "거리",
     "reason_text": "이동하기 편한 위치가 아니라면 방문하기 망설여진다",
     "community": [
-      "인스타",
-      "없음"
+      "인스타"
     ]
   },
   {
@@ -182,8 +178,7 @@
     "reason_type": "가격",
     "reason_text": "가격이 합리적이고 접근성이 좋으면 이용할 것 같다",
     "community": [
-      "당근",
-      "없음"
+      "당근"
     ]
   },
   {
@@ -204,8 +199,7 @@
     "reason_type": "시간",
     "reason_text": "가게 일을 하느라 카페에 갈 시간이 거의 없다",
     "community": [
-      "당근",
-      "없음"
+      "당근"
     ]
   },
   {
