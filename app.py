@@ -14,6 +14,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import pydeck as pdk
 import streamlit as st
+import streamlit.components.v1 as components
 
 from frontend.data_io import DataContractError, exposed_until, load_dataset
 from frontend.animated_map import build_map_html
@@ -280,8 +281,8 @@ if not result["steps"]:
 else:
     if map_mode == "인터랙티브 애니메이션":
         anim_result = {**result, "_is_demo": demo}
-        st.iframe(build_map_html(people, anim_result, dataset["geo"], result["dong"], focus_mode=focus_mode),
-                  height=670, alt=f"{result['dong']} 단계별 시민 입소문 확산 애니메이션")
+        components.html(build_map_html(people, anim_result, dataset["geo"], result["dong"], focus_mode=focus_mode),
+                        height=670, scrolling=False)
         st.caption("지도 안에서 재생·일시정지·속도 조절·단계 이동을 할 수 있습니다. 지도 로딩은 인터넷 연결이 필요합니다.")
     else:
         max_frame = len(result["steps"]) - 1
