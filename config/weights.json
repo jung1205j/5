@@ -1,0 +1,11 @@
+{
+  "version": "weights_v1",
+  "neighbor_radius_m": 500,
+  "neighbor_max": 8,
+  "path_weight": {"동네": 1.0, "에타": 0.3, "맘카페": 0.3, "당근": 0.3, "인스타": 0.3},
+  "seed_count": 5,
+  "max_steps": 20,
+  "visit_interest_min": 0.5,
+  "visit_distance_scale_m": 800,
+  "stop_awareness_threshold": 0.1
+}
