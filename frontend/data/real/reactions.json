@@ -1,215 +1,152 @@
 [
   {
-    "group": "20대이하_학생",
-    "interest": 4,
-    "share": 3,
-    "reason_type": "가격",
-    "reason_text": "커피 가격이 조금 부담되지만 친구와 함께라면 가보고 싶다",
+    "group": "20대이하_자영업",
+    "interest": 5,
+    "share": 5,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
     "community": [
-      "에타",
       "인스타"
     ]
   },
   {
     "group": "20대이하_직장인",
-    "interest": 4,
-    "share": 4,
-    "reason_type": "거리",
-    "reason_text": "회사나 집 근처에 있으면 점심시간이나 퇴근 후에 방문할 것 같다",
-    "community": [
-      "인스타",
-      "당근"
-    ]
-  },
-  {
-    "group": "20대이하_주부",
-    "interest": 3,
-    "share": 3,
-    "reason_type": "분위기",
-    "reason_text": "편하게 머물 수 있는 분위기인지 먼저 확인하고 싶다",
-    "community": [
-      "인스타",
-      "맘카페"
-    ]
-  },
-  {
-    "group": "20대이하_자영업",
-    "interest": 3,
-    "share": 2,
-    "reason_type": "시간",
-    "reason_text": "영업 때문에 카페에 들를 시간이 많지 않다",
-    "community": [
-      "인스타",
-      "당근"
-    ]
-  },
-  {
-    "group": "20대이하_기타",
-    "interest": 3,
-    "share": 3,
-    "reason_type": "관심없음",
-    "reason_text": "평소 카페를 자주 찾아다니는 편은 아니다",
-    "community": [
-      "인스타"
-    ]
-  },
-  {
-    "group": "30대_학생",
-    "interest": 4,
-    "share": 3,
-    "reason_type": "가격",
-    "reason_text": "공부하거나 친구를 만날 장소로 괜찮지만 음료 가격을 비교해 볼 것 같다",
-    "community": [
-      "에타",
-      "인스타"
-    ]
-  },
-  {
-    "group": "30대_직장인",
-    "interest": 4,
+    "interest": 2,
     "share": 4,
     "reason_type": "기타",
-    "reason_text": "카페 내에서도 일회용 용기를 내줘서 가기가 꺼려진다.",
+    "reason_text": "임시 데이터",
     "community": [
-      "인스타",
-      "당근"
-    ]
-  },
-  {
-    "group": "30대_주부",
-    "interest": 4,
-    "share": 3,
-    "reason_type": "분위기",
-    "reason_text": "아이와 함께 가도 편안한 좌석과 분위기인지 궁금하다",
-    "community": [
-      "맘카페",
-      "당근",
       "인스타"
     ]
   },
   {
-    "group": "30대_자영업",
-    "interest": 3,
-    "share": 3,
-    "reason_type": "시간",
-    "reason_text": "가게 운영 시간과 겹쳐 자주 방문하기는 어려울 것 같다",
-    "community": [ "당근",
+    "group": "20대이하_학생",
+    "interest": 5,
+    "share": 5,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
+    "community": [
       "인스타"
     ]
   },
   {
     "group": "30대_기타",
-    "interest": 3,
-    "share": 3,
-    "reason_type": "메뉴",
-    "reason_text": "다른 카페와 비교해 특별히 끌리는 메뉴가 있는지 모르겠다",
+    "interest": 4,
+    "share": 5,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
     "community": [
-      "인스타",
-      "당근"
+      "인스타"
     ]
   },
   {
-    "group": "40대_학생",
+    "group": "30대_자영업",
+    "interest": 4,
+    "share": 3,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "30대_주부",
+    "interest": 3,
+    "share": 4,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "30대_직장인",
     "interest": 3,
     "share": 2,
-    "reason_type": "거리",
-    "reason_text": "현재 생활 반경에서 멀면 일부러 찾아가지는 않을 것 같다",
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "40대_기타",
+    "interest": 4,
+    "share": 3,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "40대_자영업",
+    "interest": 4,
+    "share": 2,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "40대_주부",
+    "interest": 2,
+    "share": 4,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
     "community": [
       "인스타"
     ]
   },
   {
     "group": "40대_직장인",
-    "interest": 3,
-    "share": 3,
-    "reason_type": "가격",
-    "reason_text": "일반적인 카페와 비슷한 가격이면 방문할 생각이 있다",
+    "interest": 5,
+    "share": 2,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
     "community": [
-      "인스타",
-      "당근"
+      "인스타"
     ]
   },
   {
-    "group": "40대_주부",
+    "group": "50대이상_기타",
+    "interest": 4,
+    "share": 5,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
+    "community": [
+      "인스타"
+    ]
+  },
+  {
+    "group": "50대이상_자영업",
     "interest": 4,
     "share": 3,
-    "reason_type": "분위기",
-    "reason_text": "조용하고 좌석이 편안하면 지인과 함께 방문하고 싶다",
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
     "community": [
-      "맘카페",
-      "당근"
+      "인스타"
     ]
   },
   {
-    "group": "40대_자영업",
-    "interest": 3,
-    "share": 2,
-    "reason_type": "시간",
-    "reason_text": "일하는 시간이 길어 카페를 이용할 기회가 많지 않다",
-    "community": [
-      "당근"
-    ]
-  },
-  {
-    "group": "40대_기타",
-    "interest": 3,
-    "share": 3,
-    "reason_type": "메뉴",
-    "reason_text": "커피 외에 선택할 수 있는 메뉴가 다양하면 좋겠다",
-    "community": [
-      "인스타",
-      "당근"
-    ]
-  },
-  {
-    "group": "50대이상_학생",
-    "interest": 3,
-    "share": 2,
-    "reason_type": "거리",
-    "reason_text": "이동하기 편한 위치가 아니라면 방문하기 망설여진다",
+    "group": "50대이상_주부",
+    "interest": 5,
+    "share": 5,
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
     "community": [
       "인스타"
     ]
   },
   {
     "group": "50대이상_직장인",
-    "interest": 3,
-    "share": 3,
-    "reason_type": "가격",
-    "reason_text": "가격이 합리적이고 접근성이 좋으면 이용할 것 같다",
-    "community": [
-      "당근"
-    ]
-  },
-  {
-    "group": "50대이상_주부",
     "interest": 4,
-    "share": 3,
-    "reason_type": "분위기",
-    "reason_text": "시끄럽지 않고 편하게 대화할 수 있는 공간이면 좋겠다",
-    "community": [
-      "맘카페",
-      "당근"
-    ]
-  },
-  {
-    "group": "50대이상_자영업",
-    "interest": 2,
     "share": 2,
-    "reason_type": "시간",
-    "reason_text": "가게 일을 하느라 카페에 갈 시간이 거의 없다",
+    "reason_type": "기타",
+    "reason_text": "임시 데이터",
     "community": [
-      "당근"
-    ]
-  },
-  {
-    "group": "50대이상_기타",
-    "interest": 3,
-    "share": 2,
-    "reason_type": "관심없음",
-    "reason_text": "평소 외부 카페보다 집에서 커피를 마시는 편이다",
-    "community": [
-      "없음"
+      "인스타"
     ]
   }
 ]
