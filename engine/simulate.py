@@ -1,4 +1,4 @@
-"""LocalSim 확산 엔진 - 목요일 초안 (동네 관계망 + 단순 확산 + 랜덤 시드)
+"""LocalSim 확산 엔진 (동네 + 커뮤니티 관계망, 확산, 방문 계산, 랜덤 시드)
 
 실행 (저장소 맨 위에서):
     python engine/simulate.py
@@ -75,7 +75,30 @@ def build_neighbor_edges(people, radius_m, max_neighbors):
     return [{"from": a, "to": b, "type": "동네"} for a, b in sorted(edges)]
 
 
-# 금요일: build_community_edges(people, reactions, ...) 추가 예정 (type: 에타/맘카페/당근/인스타)
+def build_community_edges(people, reactions, links_per_person, radius_by_community, seed):
+    """같은 커뮤니티 이용자끼리 연결.
+    글 하나가 회원 여럿에게 보이는 효과를 사람당 무작위 links_per_person명 연결로 근사.
+    설득력은 weights의 path_weight로 동네보다 약하게.
+    radius_by_community에 반경이 있는 커뮤니티(예: 당근)는 그 거리 안 회원끼리만 연결."""
+    rng = random.Random(f"community-{seed}")
+    members = defaultdict(list)
+    for p in people:
+        for c in reactions.get(p["group"], {}).get("community", []):
+            if c != "없음":
+                members[c].append(p)
+
+    edges = set()
+    for c in sorted(members):
+        pool = members[c]
+        radius = radius_by_community.get(c)
+        for p in pool:
+            cand = [q for q in pool if q["id"] != p["id"]]
+            if radius:
+                cand = [q for q in cand if distance_m(p["lat"], p["lng"], q["lat"], q["lng"]) <= radius]
+            for q in rng.sample(cand, min(links_per_person, len(cand))):
+                a, b = sorted((p["id"], q["id"]))
+                edges.add((a, b, c))
+    return [{"from": a, "to": b, "type": t} for a, b, t in sorted(edges)]
 
 
 # ---------- 가게 위치 ----------
@@ -170,9 +193,12 @@ def main():
         print(f"[경고] reactions.json에 없는 집단 {len(missing)}개 -> 무관심(0)으로 처리: {missing[:5]}")
 
     edges = build_neighbor_edges(people, w["neighbor_radius_m"], w["neighbor_max"])
+    edges += build_community_edges(people, reactions, w["community_links_per_person"],
+                                   w.get("community_radius_m", {}), args.seed)
     with open(folder / "edges.json", "w", encoding="utf-8") as f:
         json.dump(edges, f, ensure_ascii=False)
-    print(f"관계망: 시민 {len(people)}명, 연결 {len(edges)}개 -> edges.json")
+    by_type = Counter(e["type"] for e in edges)
+    print(f"관계망: 시민 {len(people)}명, 연결 {len(edges)}개 {dict(by_type)} -> edges.json")
 
     for code, name in DEFAULT_CANDIDATES.items():
         res = simulate(code, name, people, edges, reactions, geo, w, args.seed)
