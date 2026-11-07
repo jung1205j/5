@@ -1,5 +1,5 @@
 {
-  "version": "weights_v1",
+  "version": "weights_v2",
   "neighbor_radius_m": 500,
   "neighbor_max": 8,
   "path_weight": {
@@ -17,5 +17,6 @@
   "community_links_per_person": 5,
   "community_radius_m": {
     "당근": 1500
-  }
+  },
+  "transmission_scale": 0.26
 }

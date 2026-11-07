@@ -1,152 +1,176 @@
 [
   {
     "group": "20대이하_자영업",
-    "interest": 5,
-    "share": 5,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 4.0,
+    "share": 3.4,
+    "reason_type": "시간",
+    "reason_text": "퇴근길 동선과 반대 방향이거나 야근 때문에 갈 여유가 전혀 없으면 집에서 가까워도 일부러 들르기 어려워요.",
     "community": [
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "20대이하_직장인",
-    "interest": 2,
-    "share": 4,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.91,
+    "share": 3.29,
+    "reason_type": "시간",
+    "reason_text": "판매직이라 근무시간이 불규칙하고 퇴근하면 집에서 쉬는 걸 더 선호해서, 가까워도 굳이 카페에 갈 일이 잘 없어요.",
     "community": [
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "20대이하_학생",
-    "interest": 5,
-    "share": 5,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.98,
+    "share": 3.35,
+    "reason_type": "가격",
+    "reason_text": "지금 구직 중이라 지출을 줄이려 하고, 4인 가구 생활상 가족 일정이나 집안 사정 때문에 자주 외출하기는 어려워요.",
     "community": [
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "30대_기타",
-    "interest": 4,
-    "share": 5,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.5,
+    "share": 2.83,
+    "reason_type": "가격",
+    "reason_text": "현재는 1인 가구에 경제활동을 하지 않는 상태라 카페·디저트 지출을 아끼는 편이라 가까워도 자주 가지진 않을 것 같습니다.",
     "community": [
-      "인스타"
+      "맘카페",
+      "당근",
+      "인스타",
+      "없음"
     ]
   },
   {
     "group": "30대_자영업",
-    "interest": 4,
-    "share": 3,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.71,
+    "share": 3.0,
+    "reason_type": "시간",
+    "reason_text": "퇴근이 늦고 집에 돌아가면 가족과 저녁을 챙겨야 해서 주중에는 가볼 시간이 거의 없습니다.",
     "community": [
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "30대_주부",
-    "interest": 3,
-    "share": 4,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 4.0,
+    "share": 3.78,
+    "reason_type": "분위기",
+    "reason_text": "아이가 있어 좌석이 좁거나 유모차로 들어가기 불편하면 외출 자체가 번거로워 가까워도 잘 가지 않을 것 같아요.",
     "community": [
+      "맘카페",
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "30대_직장인",
-    "interest": 3,
-    "share": 2,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.9,
+    "share": 3.25,
+    "reason_type": "시간",
+    "reason_text": "가까워도 잘 가지 않는다면 가장 큰 이유는 퇴근 후 가족(아이) 돌봄과 집안일 등으로 여유 시간이 거의 없고, 아이와 가기에는 좌석·놀이 공간 등이 없어 불편하기 때문입니다.",
     "community": [
+      "맘카페",
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "40대_기타",
-    "interest": 4,
-    "share": 3,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.6,
+    "share": 2.8,
+    "reason_type": "가격",
+    "reason_text": "혼자 사는 1인 가구라 외식·카페비를 아끼는 편이고 현재 경제활동을 하지 않아 디저트값이 부담돼 가까워도 자주 가지 않을 것 같습니다.",
     "community": [
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "40대_자영업",
-    "interest": 4,
-    "share": 2,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 4.0,
+    "share": 3.22,
+    "reason_type": "시간",
+    "reason_text": "혼자 사는 1인 가구라 디저트를 사 와도 혼자 먹기 부담스럽고 남은 건 버리기 싫습니다. 또한 직업 특성상 야근도 잦아 퇴근길에 들를 여유가 없는 경우가 많습니다.",
     "community": [
+      "맘카페",
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "40대_주부",
-    "interest": 2,
-    "share": 4,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.85,
+    "share": 3.3,
+    "reason_type": "가격",
+    "reason_text": "가까워도 가격이 비싸거나 자리 없으면 잘 안 가요; 주로 집에서 가족과 시간을 보내고 외식비를 아끼려는 편이라 자주 들르지 못합니다.",
     "community": [
+      "맘카페",
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "40대_직장인",
-    "interest": 5,
-    "share": 2,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.65,
+    "share": 3.03,
+    "reason_type": "시간",
+    "reason_text": "서비스업이라 저녁·주말 근무가 잦고 3인 가구라 아이를 맡기기 어려운 날이 많아 근무 시간과 겹치면 갈 수 없습니다.",
     "community": [
+      "맘카페",
+      "당근",
       "인스타"
     ]
   },
   {
     "group": "50대이상_기타",
-    "interest": 4,
-    "share": 5,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.16,
+    "share": 2.44,
+    "reason_type": "가격",
+    "reason_text": "가까워도 잘 안 가요. 혼자 가면 외롭고 디저트·음료값이 제 월수입에 비해 부담돼서 자주 들르기 어렵습니다.",
     "community": [
-      "인스타"
+      "당근",
+      "없음"
     ]
   },
   {
     "group": "50대이상_자영업",
-    "interest": 4,
-    "share": 3,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.44,
+    "share": 2.84,
+    "reason_type": "시간",
+    "reason_text": "서비스업이라 퇴근 후 피곤해 바로 집에 가서 쉬는 편이고 배우자와 집에서 저녁을 챙겨 먹어야 해서 밖에서 디저트를 즐길 시간이 없는 경우가 많습니다.",
     "community": [
-      "인스타"
+      "맘카페",
+      "당근",
+      "없음"
     ]
   },
   {
     "group": "50대이상_주부",
-    "interest": 5,
-    "share": 5,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.44,
+    "share": 2.62,
+    "reason_type": "가격",
+    "reason_text": "가구 연소득이 약 1,066만원이라 외식비가 부담되어 걸어서 10분 거리여도 자주 가기 어렵고, 집에서 가족들과 간단히 만들어 먹는 편이라요.",
     "community": [
-      "인스타"
+      "당근",
+      "없음"
     ]
   },
   {
     "group": "50대이상_직장인",
-    "interest": 4,
-    "share": 2,
-    "reason_type": "기타",
-    "reason_text": "임시 데이터",
+    "interest": 3.34,
+    "share": 2.66,
+    "reason_type": "시간",
+    "reason_text": "공장 장치 조작 일을 해서 퇴근하면 허리도 아프고 피로가 심해 줄 서서 오래 머무르기보다 집에서 쉬는 편이라 잘 가지 않을 것 같습니다. 주말에는 가족 식사 준비와 집안일을 우선하다 보니 카페에 갈 시간이 별로 없습니다.",
     "community": [
-      "인스타"
+      "맘카페",
+      "당근",
+      "없음"
     ]
   }
 ]

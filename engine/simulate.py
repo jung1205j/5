@@ -144,7 +144,7 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed):
             for r, path in sorted(adj[s]):
                 if r in informed:
                     continue
-                p = share[s] * interest[r] * w["path_weight"][path]
+                p = w.get("transmission_scale", 1.0) * share[s] * interest[r] * w["path_weight"][path]
                 if rng.random() < p:
                     informed.add(r)
                     new.append(r)
@@ -180,6 +180,8 @@ def main():
     ap.add_argument("--data", default="frontend/data/real")
     ap.add_argument("--weights", default="config/weights.json")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--all-dongs", action="store_true", help="후보 3개 대신 페르소나에 있는 모든 동 계산 (검증용)")
+    ap.add_argument("--out", default=None, help="결과 저장 폴더 (기본: --data와 같은 폴더)")
     args = ap.parse_args()
 
     folder = ROOT / args.data
@@ -195,14 +197,18 @@ def main():
     edges = build_neighbor_edges(people, w["neighbor_radius_m"], w["neighbor_max"])
     edges += build_community_edges(people, reactions, w["community_links_per_person"],
                                    w.get("community_radius_m", {}), args.seed)
-    with open(folder / "edges.json", "w", encoding="utf-8") as f:
+    out_dir = ROOT / args.out if args.out else folder
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with open(out_dir / "edges.json", "w", encoding="utf-8") as f:
         json.dump(edges, f, ensure_ascii=False)
     by_type = Counter(e["type"] for e in edges)
     print(f"관계망: 시민 {len(people)}명, 연결 {len(edges)}개 {dict(by_type)} -> edges.json")
 
-    for code, name in DEFAULT_CANDIDATES.items():
+    dongs = (dict(sorted({p["dong_code"]: p["dong"] for p in people}.items()))
+             if args.all_dongs else DEFAULT_CANDIDATES)
+    for code, name in dongs.items():
         res = simulate(code, name, people, edges, reactions, geo, w, args.seed)
-        with open(folder / f"result_{code}.json", "w", encoding="utf-8") as f:
+        with open(out_dir / f"result_{code}.json", "w", encoding="utf-8") as f:
             json.dump(res, f, ensure_ascii=False, indent=2)
         heard = sum(len(s) for s in res["steps"])
         print(f"{name}: 소식 들은 시민 {heard}명 / {len(res['steps'])}단계 / 방문 가능 {res['visitors']}명 / 멈춘 집단 {len(res['stopped_at'])}개")
