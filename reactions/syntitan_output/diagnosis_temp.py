@@ -7,7 +7,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
+REPO_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(REPO_ROOT / ".env")
+
 client = OpenAI()
 
 SCRIPT_DIR = Path(__file__).resolve().parent
