@@ -1,0 +1,120 @@
+{
+  "dong_code": "1120062000",
+  "dong": "금호4가동",
+  "seed": 42,
+  "steps": [
+    [
+      3159,
+      7502,
+      9364,
+      14475,
+      25263,
+      27339
+    ],
+    [
+      21391,
+      23564,
+      28123
+    ],
+    [
+      2689,
+      18415,
+      21288,
+      26366
+    ],
+    [
+      456,
+      13021,
+      14933,
+      18255,
+      24665
+    ],
+    [
+      14902,
+      29599
+    ],
+    [
+      8815
+    ],
+    [
+      18876
+    ],
+    [
+      10254,
+      17391
+    ]
+  ],
+  "visitors": 6,
+  "stopped_at": [
+    {
+      "group": "20대이하_직장인",
+      "path": "인스타"
+    },
+    {
+      "group": "20대이하_학생",
+      "path": "인스타"
+    },
+    {
+      "group": "30대_기타",
+      "path": "맘카페"
+    },
+    {
+      "group": "30대_자영업",
+      "path": "동네"
+    },
+    {
+      "group": "30대_주부",
+      "path": "당근"
+    },
+    {
+      "group": "30대_직장인",
+      "path": "당근"
+    },
+    {
+      "group": "40대_기타",
+      "path": "인스타"
+    },
+    {
+      "group": "40대_자영업",
+      "path": "동네"
+    },
+    {
+      "group": "40대_주부",
+      "path": "인스타"
+    },
+    {
+      "group": "40대_직장인",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_기타",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_자영업",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_주부",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_직장인",
+      "path": "맘카페"
+    }
+  ],
+  "visitors_demand": 7,
+  "competition_factor": 0.883,
+  "daytime_share": 0.027,
+  "day_seeds": 1,
+  "population_in_radius": 1655,
+  "is_estimated": 0,
+  "weekly_visitors": null,
+  "breakeven_week": null,
+  "repromo": null,
+  "channel_share": null,
+  "hubs": null,
+  "scenarios": null,
+  "budget_plan": null,
+  "diagnosis": null
+}

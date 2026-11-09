@@ -1,4 +1,4 @@
-"""확산 엔진 동작 검증 테스트 (상식 테스트 4개)
+"""확산 엔진 동작 검증 테스트 (상식 테스트 6개)
 
 실행 (저장소 맨 위에서):  python tests/test_engine.py
 pytest가 있으면:          pytest tests/test_engine.py
@@ -94,9 +94,38 @@ def test_same_seed_same_result():
     assert a == b, "같은 시드인데 결과가 다름"
 
 
+def make_stats(floating=5e6, workers=3000, stores=50):
+    return {DONG: {"floating_pop": floating, "worker_pop": workers, "store_count": stores, "is_estimated": 0}}
+
+
+def run_with_stats(stats, seed=42):
+    w, people, reactions = load_weights(), make_people(), make_reactions(interest=4)
+    for p in people[::2]:  # 절반은 다른 동 주민 (낮 방문자 후보)
+        p["dong_code"] = "8888888888"
+    edges = eng.build_neighbor_edges(people, w["neighbor_radius_m"], w["neighbor_max"])
+    return eng.simulate(DONG, "테스트동", people, edges, reactions, make_geo(CENTER), w, seed, stats)
+
+
+def test_more_floating_more_day_visitors():
+    """5) 유동인구·직장인구가 많은 동일수록 낮 출발점과 방문 수요가 늘어난다"""
+    low = run_with_stats(make_stats(floating=2e6, workers=1000))
+    high = run_with_stats(make_stats(floating=20e6, workers=30000))
+    assert high["day_seeds"] > low["day_seeds"], f"낮 출발점 {low['day_seeds']} -> {high['day_seeds']}"
+    assert high["daytime_share"] > low["daytime_share"], "낮 방문 비율이 늘지 않음"
+
+
+def test_more_competition_fewer_visitors():
+    """6) 같은 수요라도 근처 경쟁 점포가 많으면 방문 가능 고객이 줄어든다"""
+    few = run_with_stats(make_stats(stores=20))
+    many = run_with_stats(make_stats(stores=500))
+    assert few["visitors_demand"] == many["visitors_demand"], "테스트 전제(같은 수요)가 깨짐"
+    assert many["visitors"] < few["visitors"], f"경쟁 적음 {few['visitors']}명, 많음 {many['visitors']}명"
+
+
 if __name__ == "__main__":
     tests = [test_no_interest_no_spread, test_more_interest_more_spread,
-             test_farther_store_fewer_visitors, test_same_seed_same_result]
+             test_farther_store_fewer_visitors, test_same_seed_same_result,
+             test_more_floating_more_day_visitors, test_more_competition_fewer_visitors]
     failed = 0
     for t in tests:
         try:

@@ -1,0 +1,111 @@
+{
+  "dong_code": "1150051000",
+  "dong": "염창동",
+  "seed": 42,
+  "steps": [
+    [
+      1095,
+      1868,
+      4449,
+      5923,
+      13262,
+      18822,
+      27691,
+      28056
+    ],
+    [
+      3298,
+      4319,
+      6834,
+      8105,
+      14119,
+      19251,
+      28733
+    ],
+    [
+      5727,
+      14047,
+      22868
+    ],
+    [
+      22076
+    ]
+  ],
+  "visitors": 4,
+  "stopped_at": [
+    {
+      "group": "20대이하_자영업",
+      "path": "당근"
+    },
+    {
+      "group": "20대이하_직장인",
+      "path": "동네"
+    },
+    {
+      "group": "20대이하_학생",
+      "path": "동네"
+    },
+    {
+      "group": "30대_기타",
+      "path": "인스타"
+    },
+    {
+      "group": "30대_자영업",
+      "path": "인스타"
+    },
+    {
+      "group": "30대_주부",
+      "path": "동네"
+    },
+    {
+      "group": "30대_직장인",
+      "path": "맘카페"
+    },
+    {
+      "group": "40대_기타",
+      "path": "당근"
+    },
+    {
+      "group": "40대_자영업",
+      "path": "맘카페"
+    },
+    {
+      "group": "40대_주부",
+      "path": "맘카페"
+    },
+    {
+      "group": "40대_직장인",
+      "path": "맘카페"
+    },
+    {
+      "group": "50대이상_기타",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_자영업",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_주부",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_직장인",
+      "path": "맘카페"
+    }
+  ],
+  "visitors_demand": 5,
+  "competition_factor": 0.74,
+  "daytime_share": 0.087,
+  "day_seeds": 3,
+  "population_in_radius": 1491,
+  "is_estimated": 0,
+  "weekly_visitors": null,
+  "breakeven_week": null,
+  "repromo": null,
+  "channel_share": null,
+  "hubs": null,
+  "scenarios": null,
+  "budget_plan": null,
+  "diagnosis": null
+}

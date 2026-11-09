@@ -1,5 +1,5 @@
 {
-  "version": "weights_v2",
+  "version": "weights_v3",
   "neighbor_radius_m": 500,
   "neighbor_max": 8,
   "path_weight": {
@@ -18,5 +18,14 @@
   "community_radius_m": {
     "당근": 1500
   },
-  "transmission_scale": 0.26
+  "transmission_scale": 0.28,
+  "sim_radius_m": 3000,
+  "day_seeds_per_million_floating": 0.3,
+  "day_seeds_per_1000_workers": 0.2,
+  "day_seed_max": 15,
+  "day_visit_per_million_floating": 0.01,
+  "day_visit_per_1000_workers": 0.002,
+  "day_visit_cap": 0.4,
+  "competition_k": 45,
+  "competition_alpha": 0.3
 }

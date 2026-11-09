@@ -1,0 +1,102 @@
+{
+  "dong_code": "1154564000",
+  "dong": "독산4동",
+  "seed": 42,
+  "steps": [
+    [
+      19591,
+      22761,
+      23139,
+      25051,
+      25890,
+      28562
+    ],
+    [
+      9479,
+      13949,
+      16778
+    ],
+    [
+      14889,
+      23782,
+      25660,
+      28200,
+      28817
+    ],
+    [
+      3019,
+      10944,
+      14680,
+      26232
+    ]
+  ],
+  "visitors": 5,
+  "stopped_at": [
+    {
+      "group": "20대이하_직장인",
+      "path": "인스타"
+    },
+    {
+      "group": "20대이하_학생",
+      "path": "당근"
+    },
+    {
+      "group": "30대_기타",
+      "path": "인스타"
+    },
+    {
+      "group": "30대_주부",
+      "path": "동네"
+    },
+    {
+      "group": "30대_직장인",
+      "path": "맘카페"
+    },
+    {
+      "group": "40대_기타",
+      "path": "인스타"
+    },
+    {
+      "group": "40대_자영업",
+      "path": "동네"
+    },
+    {
+      "group": "40대_주부",
+      "path": "맘카페"
+    },
+    {
+      "group": "40대_직장인",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_기타",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_자영업",
+      "path": "맘카페"
+    },
+    {
+      "group": "50대이상_주부",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_직장인",
+      "path": "당근"
+    }
+  ],
+  "visitors_demand": 5,
+  "competition_factor": 0.868,
+  "daytime_share": 0.04,
+  "day_seeds": 1,
+  "population_in_radius": 1622,
+  "is_estimated": 0,
+  "weekly_visitors": null,
+  "breakeven_week": null,
+  "repromo": null,
+  "channel_share": null,
+  "hubs": null,
+  "scenarios": null,
+  "budget_plan": null,
+  "diagnosis": null
+}

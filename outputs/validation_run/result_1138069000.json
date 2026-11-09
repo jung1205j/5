@@ -1,0 +1,91 @@
+{
+  "dong_code": "1138069000",
+  "dong": "진관동",
+  "seed": 42,
+  "steps": [
+    [
+      1252,
+      4582,
+      6393,
+      14473,
+      14693,
+      15496,
+      27062
+    ],
+    [
+      2342,
+      2447,
+      3916,
+      6107,
+      11119,
+      20388,
+      28283
+    ],
+    [
+      1600,
+      8170,
+      10791,
+      26662,
+      29573
+    ],
+    [
+      28139
+    ],
+    [
+      13953
+    ]
+  ],
+  "visitors": 4,
+  "stopped_at": [
+    {
+      "group": "20대이하_직장인",
+      "path": "당근"
+    },
+    {
+      "group": "20대이하_학생",
+      "path": "인스타"
+    },
+    {
+      "group": "30대_기타",
+      "path": "맘카페"
+    },
+    {
+      "group": "30대_주부",
+      "path": "인스타"
+    },
+    {
+      "group": "30대_직장인",
+      "path": "인스타"
+    },
+    {
+      "group": "40대_기타",
+      "path": "인스타"
+    },
+    {
+      "group": "50대이상_기타",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_주부",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_직장인",
+      "path": "맘카페"
+    }
+  ],
+  "visitors_demand": 5,
+  "competition_factor": 0.707,
+  "daytime_share": 0.07,
+  "day_seeds": 2,
+  "population_in_radius": 390,
+  "is_estimated": 0,
+  "weekly_visitors": null,
+  "breakeven_week": null,
+  "repromo": null,
+  "channel_share": null,
+  "hubs": null,
+  "scenarios": null,
+  "budget_plan": null,
+  "diagnosis": null
+}

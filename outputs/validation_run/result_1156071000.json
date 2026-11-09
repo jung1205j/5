@@ -1,0 +1,114 @@
+{
+  "dong_code": "1156071000",
+  "dong": "대림2동",
+  "seed": 42,
+  "steps": [
+    [
+      1509,
+      1903,
+      5726,
+      6647,
+      9507,
+      10657,
+      25168
+    ],
+    [
+      13064,
+      19702,
+      20376,
+      29475
+    ],
+    [
+      4641,
+      11261,
+      22207,
+      27224
+    ],
+    [
+      4713,
+      6823,
+      17735,
+      24726
+    ],
+    [
+      12123,
+      26936
+    ],
+    [
+      24559
+    ]
+  ],
+  "visitors": 6,
+  "stopped_at": [
+    {
+      "group": "20대이하_직장인",
+      "path": "인스타"
+    },
+    {
+      "group": "20대이하_학생",
+      "path": "당근"
+    },
+    {
+      "group": "30대_기타",
+      "path": "인스타"
+    },
+    {
+      "group": "30대_자영업",
+      "path": "동네"
+    },
+    {
+      "group": "30대_주부",
+      "path": "당근"
+    },
+    {
+      "group": "30대_직장인",
+      "path": "인스타"
+    },
+    {
+      "group": "40대_기타",
+      "path": "동네"
+    },
+    {
+      "group": "40대_자영업",
+      "path": "맘카페"
+    },
+    {
+      "group": "40대_주부",
+      "path": "맘카페"
+    },
+    {
+      "group": "40대_직장인",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_기타",
+      "path": "당근"
+    },
+    {
+      "group": "50대이상_자영업",
+      "path": "동네"
+    },
+    {
+      "group": "50대이상_주부",
+      "path": "동네"
+    },
+    {
+      "group": "50대이상_직장인",
+      "path": "당근"
+    }
+  ],
+  "visitors_demand": 7,
+  "competition_factor": 0.86,
+  "daytime_share": 0.054,
+  "day_seeds": 2,
+  "population_in_radius": 2109,
+  "is_estimated": 0,
+  "weekly_visitors": null,
+  "breakeven_week": null,
+  "repromo": null,
+  "channel_share": null,
+  "hubs": null,
+  "scenarios": null,
+  "budget_plan": null,
+  "diagnosis": null
+}
