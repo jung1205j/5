@@ -9,6 +9,7 @@ from __future__ import annotations
 import html
 import json
 from pathlib import Path
+from datetime import time
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -17,14 +18,18 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from frontend.data_io import DataContractError, exposed_until, load_dataset
+from frontend.final_features import (
+    metric, weekly_frame, repromo_frame, channel_frame, scenarios_frame,
+    budget_frame, hubs_frame, input_payload, preview_fields, number,
+)
 from frontend.animated_map import build_map_html
 from frontend.analysis_helpers import (total_exposed, exposure_by_step, summaries,
                               summary_export, scenario_options, get_reason, html_report)
 
 ROOT = Path(__file__).resolve().parent
 st.set_page_config(
-    page_title="LocalSim · 로컬 창업 시뮬레이터",
-    page_icon="🗺️", layout="wide", initial_sidebar_state="expanded",
+    page_title="노른자 · 입소문 상권 시뮬레이터",
+    page_icon="🟡", layout="wide", initial_sidebar_state="expanded",
 )
 
 CSS = """
@@ -83,6 +88,14 @@ header#streamlitHeader,footer{visibility:hidden;}
 .ls-dot{display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:100%;background:#31c5a4;}
 .ls-dot.missing{background:#7a899c;}
 @media(max-width:850px){[data-testid='stMainBlockContainer'],section.main .block-container{padding:1rem .8rem 3rem!important}.ls-title{font-size:2.05rem}.ls-kpi-value{font-size:1.4rem}.ls-card{min-height:auto;padding:14px}}
+/* Norunja yellow accents; all numeric simulation results remain read-only. */
+[data-testid='stButton'] button[kind='primary'] {
+  background:#FFD348!important;color:#3D2B13!important;border-color:#FFD348!important;
+}
+[data-testid='stExpander'] {border:1px solid #314b5e;border-radius:12px;}
+[data-testid='stNumberInput'] input, [data-testid='stTimeInput'] input {
+  background:#15283a!important;color:#edf7ff!important;
+}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -154,12 +167,18 @@ def curve_chart(item: dict) -> go.Figure:
 
 # SIDE PANEL
 with st.sidebar:
-    st.markdown('<div class="ls-side-name">◈ LocalSim / Team 05</div>'
+    st.markdown('<div class="ls-side-name">🟡 노른자 / Team 05</div>'
                 '<div class="ls-side-sub">LOCAL WORD-OF-MOUTH LAB · 2026 AI HACKATHON</div>',
                 unsafe_allow_html=True)
     source = st.radio("데이터 소스", ["샘플 데이터", "팀 실데이터"], index=0,
                       help="팀 실데이터는 frontend/data/real 폴더에 PM과 B 담당 파일을 넣어야 활성화됩니다.")
     demo = source == "샘플 데이터"
+    preview_new_sections = st.checkbox(
+        "최종 결과 화면 미리보기 · 예시 수치", value=False, disabled=not demo,
+        help="디자인 확인용이며 실제 엔진 계산이나 다운로드 결과에 반영되지 않습니다.",
+    )
+    if demo and preview_new_sections:
+        st.info("미리보기 모드: 신규 지표와 그래프의 숫자는 팀 결과가 아닌 예시입니다.")
     folder = ROOT / "frontend" / "data" / ("demo" if demo else "real")
     if demo:
         st.warning("DEMO · 결과 수치·시민·경계는 시연을 위한 가상 데이터입니다.")
@@ -191,7 +210,7 @@ dong_codes = list(base_results.keys())
 scenarios = scenario_options(folder, people)
 
 st.markdown('<div class="ls-kicker">LOCATION INTELLIGENCE / WOM SIMULATION / 2026</div>'
-            '<div class="ls-head"><div class="ls-mark">◈</div><div class="ls-title">LocalSim</div></div>'
+            '<div class="ls-head"><div class="ls-mark">◈</div><div class="ls-title">노른자</div></div>'
             '<div class="ls-sub">가게를 열기 전, 동네별 가상 시민의 반응과 입소문 확산을 비교하고 정체 지점을 진단하는 실험 공간.</div>'
             '<span class="ls-pill">TEAM 05 · 프론트엔드</span>'
             + ('<span class="ls-pill warn">데모 / 가상 결과</span>' if demo else '<span class="ls-pill warn">팀 계산 결과 / 검증 별도</span>'),
@@ -205,10 +224,29 @@ with form_left:
 with form_right:
     selected = st.multiselect("비교 후보 지역 (1~3개)", dong_codes, default=dong_codes[:3], max_selections=3,
                               format_func=lambda c: f"{base_results[c]['dong']} · {c}")
-    with st.expander("추가 정보 입력(향후 연동)"):
-        target = st.text_input("타깃 고객", placeholder="예: 대학생·20대 직장인")
-        price = st.text_input("가격대", placeholder="예: 디저트 5천~9천 원")
-        st.caption("이 두 입력도 현재 계산 결과에는 영향을 주지 않습니다.")
+    target = st.text_input("타깃 고객 (선택)", placeholder="예: 대학생·20대 직장인")
+    price = st.text_input("가격대 (선택)", placeholder="예: 디저트 5천~9천 원")
+
+with st.expander("선택 입력 · 영업시간 / 월세 / 객단가 / 홍보 예산", expanded=True):
+    st.caption("선택 입력값은 현재 분석 결과를 다시 계산하지 않습니다. 엔진 연결 이후 활용할 수 있습니다.")
+    hours_enabled = st.checkbox("영업시간 입력", value=False)
+    h1, h2 = st.columns(2)
+    with h1:
+        opening = st.time_input("영업 시작", value=time(10, 0), disabled=not hours_enabled, step=1800)
+    with h2:
+        closing = st.time_input("영업 종료", value=time(22, 0), disabled=not hours_enabled, step=1800)
+    m1, m2, m3 = st.columns(3)
+    with m1:
+        rent = st.number_input("월세 (원)", min_value=0, value=None, step=100000, placeholder="선택 입력")
+    with m2:
+        avg_price = st.number_input("객단가 (원)", min_value=0, value=None, step=1000, placeholder="선택 입력")
+    with m3:
+        budget = st.number_input("홍보 예산 (원)", min_value=0, value=None, step=100000, placeholder="선택 입력")
+    business_hours = (
+        {"open": opening.strftime("%H:%M"), "close": closing.strftime("%H:%M")}
+        if hours_enabled else None
+    )
+    st.caption("영업시간 JSON 키 business_hours는 프론트엔드 제안값이며 팀 엔진과 형식 합의가 필요합니다.")
 
 if not selected:
     st.info("후보 지역을 하나 이상 선택해 주세요.")
@@ -219,7 +257,20 @@ with left_button:
     if st.button("◈  시뮬레이션 결과 보기", type="primary", use_container_width=True):
         st.session_state["opened"] = True
 with right_notice:
-    st.caption("현재는 계산된 결과를 여는 동작입니다. 아이디어를 바꾸어도 재계산하지 않습니다.")
+    st.caption("기존 결과 파일을 여는 동작이며 입력값 변경만으로 시뮬레이션이 재실행되지는 않습니다.")
+    payload = input_payload(
+        idea=idea,
+        regions=[base_results[code]["dong"] for code in selected],
+        business_hours=business_hours,
+        rent=rent, avg_price=avg_price, budget=budget,
+    )
+    st.download_button(
+        "입력 조건 JSON 내려받기",
+        data=json.dumps(payload, ensure_ascii=False, indent=2),
+        file_name="norunja_scenario_input.json",
+        mime="application/json",
+        help="엔진 결과가 아닌 입력 조건 인수인계용 JSON입니다.",
+    )
 
 if not st.session_state.get("opened", False):
     note("버튼을 누르면 지도와 지역별 비교·진단 결과가 표시됩니다. 샘플 모드에서는 모두 가상 수치입니다.")
@@ -276,6 +327,12 @@ with view_col:
                                 help="동을 바꾸면 선택한 동 중심으로 이동합니다. 전체 동 보기에서는 모든 시민의 위치가 한 화면에 보입니다.")
 focus_mode = "selected" if focus_choice == "선택 동 확대" else "all"
 result = active_results[region]
+display_result = (
+    {**result, **preview_fields()}
+    if demo and preview_new_sections else result
+)
+if demo and preview_new_sections:
+    st.warning("신규 결과 영역은 디자인용 예시 숫자입니다. 기존 지도·순위·다운로드 결과에는 적용하지 않습니다.")
 if not result["steps"]:
     st.warning("확산 단계 데이터가 비어 있습니다. PM의 JSON을 확인하세요.")
 else:
@@ -334,7 +391,137 @@ if scenario_choice != "baseline":
         st.dataframe(pd.DataFrame(diff_rows), hide_index=True, use_container_width=True)
         st.caption("차이는 시나리오 간 모델 계산 결과 차이이며, 실제 개선 효과를 입증하지 않습니다.")
 
-heading("05" if not scenarios else "06", "정체 지점과 반응 근거", "확산 엔진이 기록한 정체 집단·경로와 A 담당의 집단별 거절 이유를 함께 확인합니다.")
+
+heading("05", "방문 수요 · 경쟁 · 낮 시간대 비중",
+        "엔진에서 전달한 원본 지표를 그대로 표시합니다. 아직 없는 항목은 자료 대기로 표시합니다.")
+metrics = st.columns(3)
+for col, field, label in zip(
+    metrics,
+    ("visitors_demand", "competition_factor", "daytime_share"),
+    ("방문 수요", "경쟁 보정 계수", "낮 시간대 비중"),
+):
+    with col:
+        card(label, metric(display_result, field), "엔진 제공 결과 · 모형 가정 확인 필요")
+
+heading("06", "12주 방문객 곡선 · 손익분기",
+        "주별 수치는 엔진 결과를 이용합니다. 확산 단계와 주 단위를 임의로 혼동하지 않습니다.")
+wk_col, be_col = st.columns([2, 1], gap="large")
+with wk_col:
+    weeks = weekly_frame(display_result)
+    if weeks.empty:
+        st.info("12주 방문객 데이터 대기 중 · weekly_visitors가 제공되면 표시됩니다.")
+    else:
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=weeks["week"], y=weeks["visitors"],
+            mode="lines+markers", name="주별 방문 가능 고객",
+            line={"color":"#FFD348","width":3},
+            hovertemplate="%{x}주차 · %{y}명<extra></extra>",
+        ))
+        promo = repromo_frame(display_result)
+        if not promo.empty:
+            for colname, title, color in (
+                ("with_promo", "추가 홍보", "#49dacb"),
+                ("without_promo", "홍보 없음", "#8ba6bc"),
+            ):
+                fig.add_trace(go.Scatter(
+                    x=promo["week"],y=promo[colname],
+                    mode="lines", name=title,
+                    line={"color":color,"width":2,"dash":"dot"},
+                ))
+        fig.update_layout(
+            height=325, paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font={"color":"#dcebf5"},
+            xaxis={"title":"주차","dtick":1},
+            yaxis={"title":"방문 가능 고객","gridcolor":"#234157"},
+            margin={"l":10,"r":10,"t":20,"b":25},
+            legend={"orientation":"h","y":1.15},
+        )
+        st.plotly_chart(fig, use_container_width=True)
+with be_col:
+    be = number(display_result.get("breakeven_week"))
+    card("손익분기 시점", f"{int(be)}주차" if be is not None and be >= 0 else "자료 대기",
+         "원가·인건비 등 비용 가정을 확인해야 합니다")
+    st.caption("월세와 객단가만으로 정확한 손익분기를 보장할 수 없습니다.")
+
+heading("07", "채널별 유입 비율",
+        "소식을 접한 경로를 집단별로 비교합니다. 값이 없는 집단을 임의로 채우지 않습니다.")
+channels = channel_frame(display_result)
+if channels.empty:
+    st.info("채널별 유입 데이터 대기 중 · channel_share가 제공되면 표시됩니다.")
+else:
+    fig = go.Figure()
+    for channel in channels["channel"].unique():
+        rows = channels[channels["channel"] == channel]
+        fig.add_trace(go.Bar(
+            name=channel, x=rows["group"], y=rows["percent"],
+            hovertemplate="%{x} · %{y:.1f}%<extra>" + channel + "</extra>",
+        ))
+    fig.update_layout(
+        barmode="stack", height=350, paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)", font={"color":"#dcebf5"},
+        yaxis={"title":"비율 (%)","range":[0,100],"gridcolor":"#234157"},
+        xaxis={"title":"집단"}, margin={"l":0,"r":0,"t":20,"b":70},
+        legend={"orientation":"h"},
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+heading("08", "홍보 시나리오 · 예산 비교",
+        "홍보 효과는 엔진의 가정값입니다. 실제 광고 성과를 보장하지 않습니다.")
+promo_left, promo_right = st.columns(2, gap="large")
+with promo_left:
+    st.markdown("**홍보 방식별 방문 고객 증가량**")
+    scenario_rows = scenarios_frame(display_result)
+    if scenario_rows.empty:
+        st.info("시나리오 결과 대기 중 · scenarios 필드가 필요합니다.")
+    else:
+        fig = go.Figure(go.Bar(
+            x=scenario_rows["name"], y=scenario_rows["visitors_gain"],
+            marker_color="#FFD348",
+            hovertemplate="%{x} · 증가 %{y}명<extra></extra>",
+        ))
+        fig.update_layout(
+            height=285, paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)", font={"color":"#dcebf5"},
+            yaxis={"title":"추가 방문 가능 고객","gridcolor":"#234157"},
+            margin={"l":0,"r":0,"t":12,"b":40},
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        st.dataframe(scenario_rows.rename(columns={"name":"홍보 채널","cost":"비용(원)","visitors_gain":"증가 고객"}),
+                     hide_index=True, use_container_width=True)
+with promo_right:
+    st.markdown("**예산 추천 배분안**")
+    split = budget_frame(display_result)
+    if split.empty:
+        st.info("예산 배분 결과 대기 중 · budget_plan.split이 필요합니다.")
+    else:
+        fig = go.Figure(go.Pie(
+            labels=split["channel"], values=split["amount"], hole=.58,
+        ))
+        fig.update_layout(
+            height=285, paper_bgcolor="rgba(0,0,0,0)",
+            font={"color":"#dcebf5"},
+            margin={"l":0,"r":0,"t":10,"b":20},
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        st.dataframe(split.rename(columns={"channel":"홍보 채널","amount":"배분액(원)"}),
+                     hide_index=True, use_container_width=True)
+
+heading("09", "입소문 허브 페르소나",
+        "가게 소식을 널리 전달할 가능성이 높은 가상 시민 집단을 확인합니다.")
+hubs = hubs_frame(display_result)
+if hubs.empty:
+    st.info("입소문 허브 데이터 대기 중 · hubs가 제공되면 카드가 표시됩니다.")
+else:
+    hub_cols = st.columns(min(3,len(hubs)))
+    for i, hub in enumerate(hubs.head(6).to_dict("records")):
+        with hub_cols[i % len(hub_cols)]:
+            reach = hub["reach"]
+            card(hub["group"], f"{int(reach)}명 전달" if reach is not None else "전달 수 미상",
+                 f"지역: {hub['dong']} · 가상 ID {hub['id']}")
+
+heading("10" if not scenarios else "11", "정체 지점과 반응 근거", "확산 엔진이 기록한 정체 집단·경로와 A 담당의 집단별 거절 이유를 함께 확인합니다.")
 reason_col, raw_col = st.columns([1, 1], gap="large")
 with reason_col:
     st.markdown(f"**{result['dong']} · 정체 구간**")
@@ -369,7 +556,7 @@ with raw_col:
     else:
         st.info("reactions.json 파일이 아직 없습니다.")
 
-heading("06" if not scenarios else "07", "결과 리포트와 검증 이력", "보고서에 사용할 때는 반드시 데모 여부·데이터 출처·검증 한계를 함께 제시해 주세요.")
+heading("11" if not scenarios else "12", "결과 리포트와 검증 이력", "보고서에 사용할 때는 반드시 데모 여부·데이터 출처·검증 한계를 함께 제시해 주세요.")
 report_df = summary_export(items, len(people))
 with st.expander("지역별 상세 수치", expanded=True):
     st.dataframe(report_df, hide_index=True, use_container_width=True)
@@ -397,6 +584,6 @@ with export3:
                        "localsim_report.html", "text/html", use_container_width=True,
                        help="브라우저에서 열어 인쇄/파일로 저장할 수 있는 간단 리포트입니다.")
 
-st.markdown('<div class="ls-footer">LOCAL SIMULATOR · TEAM 05 · 2026 해커톤<br>'
+st.markdown('<div class="ls-footer">노른자 · TEAM 05 · 2026 해커톤<br>'
             '현재 프론트엔드는 계산 결과의 시각화 및 비교 도구입니다. 가상 시민 수·합성 설문·모델 계산값을 실제 유동인구, 방문객 수 또는 매출 예측치로 해석해서는 안 됩니다.</div>',
             unsafe_allow_html=True)
