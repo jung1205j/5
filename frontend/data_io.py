@@ -16,7 +16,7 @@ VALID_JOBS = {"학생", "직장인", "주부", "자영업", "기타"}
 VALID_AGES = {"20대이하", "30대", "40대", "50대이상"}
 VALID_REASONS = {"가격", "거리", "분위기", "메뉴", "관심없음", "기타", "시간"}
 VALID_COMMUNITIES = {"에타", "맘카페", "당근", "인스타", "없음"}
-VALID_PATHS = VALID_COMMUNITIES - {"없음"} | {"동네"}
+VALID_PATHS = (VALID_COMMUNITIES - {"없음"}) | {"동네", "동선", "지인", "검색"}
 VALIDATION_FIELDS = {"round", "date", "target", "rank_corr", "seed_runs", "weights", "mismatch", "next"}
 FIELD_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*\Z")
 
