@@ -1,4 +1,4 @@
-"""Pure read-only analytics for LocalSim UI (no new model predictions)."""
+"""Pure read-only analytics for 노른자 UI (no new model predictions)."""
 from __future__ import annotations
 import html
 import json
@@ -9,7 +9,7 @@ from .data_io import exposed_until, read_results
 
 
 def total_exposed(item: dict) -> int:
-    return len({int(pid) for part in item.get("steps", []) for pid in part})
+    return len({pid for part in item.get("steps", []) for pid in part})
 
 
 def exposure_by_step(item: dict) -> list[dict]:
@@ -84,13 +84,13 @@ def html_report(items: list[dict], population: int, idea: str, is_demo: bool,
     rows = "".join("<tr>" + "".join(f"<td>{html.escape(str(value))}</td>" for value in row) + "</tr>"
                    for row in df.itertuples(index=False, name=None))
     note = "화면 시험을 위한 가상 데이터입니다. 실제 시장 예측이 아닙니다." if is_demo else "팀 확산 엔진 계산 결과입니다. 예측 정확도는 별도 검증이 필요합니다."
-    content = f"""<!doctype html><html lang='ko'><head><meta charset='utf-8'><title>LocalSim 결과 리포트</title>
+    content = f"""<!doctype html><html lang='ko'><head><meta charset='utf-8'><title>노른자 결과 리포트</title>
 <style>body{{font-family:'Malgun Gothic',sans-serif;color:#14314a;max-width:980px;margin:45px auto;line-height:1.65}}
 h1{{font-size:32px;letter-spacing:-1px}}.label{{color:#147e76;font-weight:bold;letter-spacing:.1em}}
 .alert{{background:#eaf7f5;border-left:4px solid #30b9a3;padding:14px;margin:18px 0}}
 .tag{{padding:4px 9px;background:#f6eee1;border-radius:12px;font-size:12px}}table{{border-collapse:collapse;width:100%;margin-top:16px}}th,td{{text-align:left;border:1px solid #dae3eb;padding:12px}}th{{background:#edf4f7}}.sub{{color:#66798b}}
 @media print{{body{{margin:20px}}}}</style></head><body>
-<div class='label'>LOCALSIM • TEAM 05</div><h1>창업 후보 입지 분석 리포트</h1><p class='sub'>시나리오: {html.escape(scenario_label)}</p>
+<div class='label'>NORUNJA • TEAM 05</div><h1>창업 후보 입지 분석 리포트</h1><p class='sub'>시나리오: {html.escape(scenario_label)}</p>
 <h3>창업 아이디어</h3><p>{html.escape(idea)}</p><div class='alert'>{html.escape(note)}</div>
 <h3>후보 동별 비교</h3><table><thead><tr>{headers}</tr></thead><tbody>{rows}</tbody></table>
 <p class='sub'>방문 가능 고객 수는 모델의 계산값이며 실제 방문객 수나 매출 예측을 의미하지 않습니다. 후보별 결과는 독립적인 시뮬레이션이며 합산하지 않습니다.</p>

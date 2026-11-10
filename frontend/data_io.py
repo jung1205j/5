@@ -16,7 +16,7 @@ VALID_JOBS = {"학생", "직장인", "주부", "자영업", "기타"}
 VALID_AGES = {"20대이하", "30대", "40대", "50대이상"}
 VALID_REASONS = {"가격", "거리", "분위기", "메뉴", "관심없음", "기타", "시간"}
 VALID_COMMUNITIES = {"에타", "맘카페", "당근", "인스타", "없음"}
-VALID_PATHS = VALID_COMMUNITIES - {"없음"} | {"동네"}
+VALID_PATHS = (VALID_COMMUNITIES - {"없음"}) | {"동네", "동선", "지인", "검색"}
 VALIDATION_FIELDS = {"round", "date", "target", "rank_corr", "seed_runs", "weights", "mismatch", "next"}
 FIELD_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*\Z")
 
@@ -44,7 +44,7 @@ def read_personas(folder: Path) -> pd.DataFrame:
     if not path.exists():
         raise DataContractError(f"{path} 파일이 없습니다.")
     try:
-        df = pd.read_csv(path, dtype={"dong_code": str}, encoding="utf-8")
+        df = pd.read_csv(path, dtype={"dong_code": str, "id": str}, encoding="utf-8-sig")
     except Exception as e:
         raise DataContractError(f"personas.csv 읽기 오류: {e}") from e
     check_lowercase_keys(df.columns, "personas.csv")
@@ -52,13 +52,19 @@ def read_personas(folder: Path) -> pd.DataFrame:
     if missing:
         raise DataContractError(f"personas.csv 필수 열 누락: {', '.join(sorted(missing))}")
     df = df.copy()
-    for field in ("id", "lat", "lng"):
+    # Preserve existing numeric IDs for the original MVP, and also accept
+    # future UUID/string IDs IF (and only if) every engine artifact uses them.
+    id_col = df["id"]
+    if id_col.isna().any() or (id_col.astype(str).str.strip() == "").any():
+        raise DataContractError("personas.csv의 id에 빈 값이 있습니다.")
+    if id_col.str.fullmatch(r"[0-9]+").all():
+        df["id"] = id_col.map(int)
+    else:
+        df["id"] = id_col.astype(str)
+    for field in ("lat", "lng"):
         df[field] = pd.to_numeric(df[field], errors="coerce")
-    if df[["id", "lat", "lng"]].isna().any().any():
-        raise DataContractError("personas.csv의 id/lat/lng는 유효한 숫자여야 합니다.")
-    if not (df["id"] % 1 == 0).all():
-        raise DataContractError("personas.csv의 id는 정수여야 합니다.")
-    df["id"] = df["id"].astype(int)
+    if df[["lat", "lng"]].isna().any().any():
+        raise DataContractError("personas.csv의 lat/lng에 유효하지 않은 좌표가 있습니다.")
     if df["id"].duplicated().any():
         raise DataContractError("personas.csv에서 시민 id가 중복되었습니다.")
     if not df["lat"].between(-90, 90).all() or not df["lng"].between(-180, 180).all():
@@ -138,8 +144,8 @@ def read_results(folder: Path, person_df: pd.DataFrame) -> list[dict]:
         if not isinstance(steps, list) or any(not isinstance(s, list) for s in steps):
             raise DataContractError(f"{path.name}: steps는 [[시민 ID, ...], ...] 형식입니다.")
         flat_ids = [pid for step in steps for pid in step]
-        if any(type(pid) is not int for pid in flat_ids):
-            raise DataContractError(f"{path.name}: 시민 ID는 정수여야 합니다.")
+        if any(not isinstance(pid, (str, int)) or isinstance(pid, bool) for pid in flat_ids):
+            raise DataContractError(f"{path.name}: 시민 ID는 정수 또는 문자열이어야 합니다.")
         if len(flat_ids) != len(set(flat_ids)):
             raise DataContractError(f"{path.name}: steps에 동일 시민 ID가 중복 등장합니다(새 노출만 기록).")
         invalid = set(flat_ids) - person_ids
@@ -193,13 +199,13 @@ def load_dataset(folder: Path):
             check_lowercase_keys(edge.keys(), f"edges.json {i}번째 관계")
             if edge["type"] not in VALID_PATHS:
                 raise DataContractError(f"edges.json {i}번째 type에 팀 규약 외 값이 있습니다: {edge['type']}")
-            if type(edge["from"]) is not int or type(edge["to"]) is not int or edge["from"] not in person_ids or edge["to"] not in person_ids:
-                raise DataContractError(f"edges.json {i}번째 관계에 없는 시민 ID가 있습니다.")
+            if any(not isinstance(edge[k], (int, str)) or isinstance(edge[k], bool) or edge[k] not in person_ids for k in ("from", "to")):
+                raise DataContractError(f"edges.json {i}번째 관계에 없는 시민 ID가 있습니다. 페르소나·엔진 ID 형식을 통일하세요.")
     return {"persons": persons, "reactions": reactions, "results": results,
             "geo": geo, "validations": validations}
 
 
-def exposed_until(steps: list[list[int]], current_step: int) -> tuple[set[int], set[int]]:
+def exposed_until(steps: list[list[int | str]], current_step: int) -> tuple[set, set]:
     """Return (cumulative exposed, newly exposed) for 0-based step.
 
     -1 is the baseline before any diffusion event.

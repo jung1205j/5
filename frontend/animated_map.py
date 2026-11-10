@@ -14,7 +14,7 @@ def build_map_html(people, result: dict, geo: dict | None, selected_dong: str, f
     # never innerHTML from dataset fields.
     person_data = [
         {
-            "id": int(p["id"]), "lat": float(p["lat"]), "lng": float(p["lng"]),
+            "id": p["id"] if isinstance(p["id"], int) else str(p["id"]), "lat": float(p["lat"]), "lng": float(p["lng"]),
             "dong": str(p["dong"]), "dong_code": str(p["dong_code"]), "group": str(p["group"]),
         }
         for p in people.to_dict("records")
