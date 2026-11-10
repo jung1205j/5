@@ -1,4 +1,4 @@
-"""확산 엔진 동작 검증 테스트 (상식 테스트 9개)
+"""확산 엔진 동작 검증 테스트 (상식 테스트 11개)
 
 실행 (저장소 맨 위에서):  python tests/test_engine.py
 pytest가 있으면:          pytest tests/test_engine.py
@@ -132,10 +132,10 @@ def test_interest_fades_over_time():
 
 
 def test_repromo_never_hurts():
-    """8) 소식이 멈출 때 추가 홍보를 하면 12주 방문객이 줄지 않는다"""
+    """8) 소식이 멈출 때 추가 홍보를 하면 어느 주에도 방문객이 줄지 않는다"""
     r = run_with_stats(make_stats())
     rp = r["repromo"]
-    assert sum(rp["with"]) >= sum(rp["without"]), f"추가 홍보 {sum(rp['with'])} < 없음 {sum(rp['without'])}"
+    assert all(a >= b for a, b in zip(rp["with"], rp["without"])), f"추가 홍보 {rp['with']} / 없음 {rp['without']}"
 
 
 def test_higher_rent_later_breakeven():
@@ -147,11 +147,33 @@ def test_higher_rent_later_breakeven():
     assert low is not None and (high is None or high > low), f"월세 100만 {low}주차, 600만 {high}주차"
 
 
+def test_evening_hours_favor_night_dong():
+    """10) 저녁 영업(17~24시)이면 밤 유동인구 비중이 큰 동이, 낮 영업(9~17시)이면 낮 비중이 큰 동이 유리하다"""
+    w = load_weights()
+    night = {"flow": {"flow_06_11": 10, "flow_11_14": 10, "flow_14_17": 10, "flow_17_21": 40, "flow_21_24": 30}}
+    day = {"flow": {"flow_06_11": 30, "flow_11_14": 30, "flow_14_17": 25, "flow_17_21": 10, "flow_21_24": 5}}
+    ev_n, _ = eng.hours_factor(night, [17, 24], w)
+    ev_d, _ = eng.hours_factor(day, [17, 24], w)
+    lu_n, _ = eng.hours_factor(night, [9, 17], w)
+    lu_d, _ = eng.hours_factor(day, [9, 17], w)
+    assert ev_n > ev_d and lu_d > lu_n, f"저녁: 밤동 {ev_n:.2f} 낮동 {ev_d:.2f} / 낮: 밤동 {lu_n:.2f} 낮동 {lu_d:.2f}"
+
+
+def test_closed_days_fewer_customers():
+    """11) 쉬는 날이 있으면 일주일 손님이 줄고, 주말이 붐비는 동에서 주말에 쉬면 더 크게 준다"""
+    weekend_heavy = {"flow": {"flow_weekday": 500, "flow_weekend": 400}}
+    all_days, _ = eng.days_factor(weekend_heavy, None)
+    no_sun, _ = eng.days_factor(weekend_heavy, ["월", "화", "수", "목", "금", "토"])
+    no_mon, _ = eng.days_factor(weekend_heavy, ["화", "수", "목", "금", "토", "일"])
+    assert all_days == 1.0 and no_sun < no_mon < all_days, f"전체 {all_days}, 일 휴무 {no_sun:.2f}, 월 휴무 {no_mon:.2f}"
+
+
 if __name__ == "__main__":
     tests = [test_no_interest_no_spread, test_more_interest_more_spread,
              test_farther_store_fewer_visitors, test_same_seed_same_result,
              test_more_floating_more_day_visitors, test_more_competition_fewer_visitors,
-             test_interest_fades_over_time, test_repromo_never_hurts, test_higher_rent_later_breakeven]
+             test_interest_fades_over_time, test_repromo_never_hurts, test_higher_rent_later_breakeven,
+             test_evening_hours_favor_night_dong, test_closed_days_fewer_customers]
     failed = 0
     for t in tests:
         try:

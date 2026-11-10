@@ -1,4 +1,4 @@
-"""LocalSim 확산 엔진
+"""LocalSim 확산 엔진 (영업시간·요일·연령대 반영)
 동네 + 커뮤니티 관계망, 유동인구·직장인구(낮 방문자), 경쟁 점포 수, 확산(1단계=1주), 방문 계산,
 12주 방문객 곡선(관심 식음 + 재방문), 추가 홍보 타이밍, 손익분기, 시드 여러 개 평균
 
@@ -53,8 +53,57 @@ def load_dong_stats(folder):
                                       "worker_pop": float(r["worker_pop"]),
                                       "store_count": float(r["store_count"]),
                                       "is_estimated": int(float(r.get("is_estimated", 0) or 0)),
-                                      "avg_price": implied_price(r)}
+                                      "avg_price": implied_price(r),
+                                      "flow": {k: num(r.get(k)) for k in FLOW_COLS}}
                 for r in csv.DictReader(f)}
+
+
+FLOW_HOURS = {"flow_06_11": (6, 11), "flow_11_14": (11, 14), "flow_14_17": (14, 17),
+              "flow_17_21": (17, 21), "flow_21_24": (21, 24)}
+FLOW_AGE = {"20대이하": "flow_age_20_under", "30대": "flow_age_30", "40대": "flow_age_40", "50대이상": "flow_age_50_over"}
+FLOW_COLS = list(FLOW_HOURS) + list(FLOW_AGE.values()) + ["flow_weekday", "flow_weekend"]
+DAYS = ["월", "화", "수", "목", "금", "토", "일"]
+
+
+def num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return None
+
+
+def overlap(a, b, c, d):
+    """[a,b) 와 [c,d) 시간 겹침 (시간 단위)"""
+    return max(0.0, min(b, d) - max(a, c))
+
+
+def hours_factor(st, open_hours, w):
+    """영업시간에 지나가는 사람 비율을, 기준 영업시간(w['reference_hours'])일 때와 비교한 배수.
+    저녁 영업이면 밤에 붐비는 동이, 낮 영업이면 오피스 상권이 유리해진다. 입력이 없으면 1"""
+    flow = (st or {}).get("flow") or {}
+    if not open_hours or not all(flow.get(k) for k in FLOW_HOURS):
+        return 1.0, 1.0
+
+    def covered(h0, h1):
+        return sum(flow[k] * overlap(h0, h1, a, b) / (b - a) for k, (a, b) in FLOW_HOURS.items())
+
+    r0, r1 = w["reference_hours"]
+    h0, h1 = open_hours
+    f_float = covered(h0, h1) / max(covered(r0, r1), 1e-9)
+    w0, w1 = w["work_hours"]  # 직장인은 근무시간에만 근처에 있음
+    f_work = overlap(h0, h1, w0, w1) / max(overlap(r0, r1, w0, w1), 1e-9)
+    return f_float, f_work
+
+
+def days_factor(st, open_days):
+    """쉬는 날을 빼면 일주일 손님 중 얼마나 남는지 (평일은 평일 유동인구/5, 주말은 주말 유동인구/2로 하루씩 계산)"""
+    flow = (st or {}).get("flow") or {}
+    wd, we = flow.get("flow_weekday"), flow.get("flow_weekend")
+    if not wd or not we:
+        return (len(open_days) / 7 if open_days else 1.0), None
+    daily = {d: (wd / 5 if i < 5 else we / 2) for i, d in enumerate(DAYS)}
+    days = open_days or DAYS
+    return sum(daily[d] for d in days if d in daily) / sum(daily.values()), we / (wd + we)
 
 
 def implied_price(r, min_tx=1000):
@@ -167,7 +216,19 @@ def local_people(dong_code, people, geo, radius_m):
 
 
 # ---------- 확산 ----------
-def spread(people, adj, seeds, share, interest, w, rng, by_id, extra_at=None):
+def coin(seed, a, b):
+    """(시드, 보내는 사람, 받는 사람)마다 고정된 0~1 난수 (splitmix64).
+    추가 홍보를 넣어도 같은 연결의 성공 여부는 그대로라, 비교할 때 운 차이가 섞이지 않는다"""
+    x = (seed * 0x9E3779B97F4A7C15 + a * 0xBF58476D1CE4E5B9 + b * 0x94D049BB133111EB) & 0xFFFFFFFFFFFFFFFF
+    x ^= x >> 30
+    x = (x * 0xBF58476D1CE4E5B9) & 0xFFFFFFFFFFFFFFFF
+    x ^= x >> 27
+    x = (x * 0x94D049BB133111EB) & 0xFFFFFFFFFFFFFFFF
+    x ^= x >> 31
+    return x / 2 ** 64
+
+
+def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None):
     """한 주에 steps_per_week 단계. 새로 들은 사람은 연결된 사람마다 한 번씩 전할 기회.
     extra_at={단계: [id,...]} 이면 그 단계에 추가 홍보로 소식을 직접 들은 사람을 더함.
     반환: steps(단계별 새로 들은 id), heard_week{id: 주차}, fails"""
@@ -187,7 +248,7 @@ def spread(people, adj, seeds, share, interest, w, rng, by_id, extra_at=None):
             for r, path in sorted(adj[s]):
                 if r in informed:
                     continue
-                if rng.random() < scale * share[s] * interest[r] * w["path_weight"][path]:
+                if coin(seed, s, r) < scale * share[s] * interest[r] * w["path_weight"][path]:
                     informed.add(r)
                     new.append(r)
                 else:
@@ -275,65 +336,97 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
     base_seeds = local[: w["seed_count"]] or sorted(dist, key=lambda i: (dist[i], i))[: w["seed_count"]]
     outsiders = sorted(p["id"] for p in people if p["dong_code"] != dong_code)
 
+    # 영업시간·요일 (입력이 없으면 영향 없음)
+    f_float, f_work = hours_factor(st, sc.get("open_hours"), w)
+    f_days, weekend_share = days_factor(st, sc.get("open_days"))
+
     # 낮 방문 비율·경쟁 계수 (동 단위, 시드와 무관)
     n_day, p_day, comp = 0, 0.0, 1.0
     if st:
-        n_day = min(int(round(w.get("day_seeds_per_million_floating", 0) * st["floating_pop"] / 1e6
-                              + w.get("day_seeds_per_1000_workers", 0) * st["worker_pop"] / 1000)),
+        n_day = min(int(round(w.get("day_seeds_per_million_floating", 0) * st["floating_pop"] * f_float / 1e6
+                              + w.get("day_seeds_per_1000_workers", 0) * st["worker_pop"] * f_work / 1000)),
                     w.get("day_seed_max", 0))
         p_day = min(w.get("day_visit_cap", 0.0),
-                    w.get("day_visit_per_million_floating", 0) * st["floating_pop"] / 1e6
-                    + w.get("day_visit_per_1000_workers", 0) * st["worker_pop"] / 1000)
+                    w.get("day_visit_per_million_floating", 0) * st["floating_pop"] * f_float / 1e6
+                    + w.get("day_visit_per_1000_workers", 0) * st["worker_pop"] * f_work / 1000)
         k = w.get("competition_k", 0)
         if k:
             comp = (k / (k + st["store_count"])) ** w.get("competition_alpha", 1.0)
 
-    # 사람별 방문 확률 (경쟁 반영 전 수요 기준)
+    # 연령대: 그 동을 지나는 사람의 나이 구성 / 반경 안 시민의 나이 구성 -> 나이대별 배수
+    age_of = {p["id"]: p["group"].split("_")[0] for p in people}
+    age_w = {a: 1.0 for a in FLOW_AGE}
+    flow = (st or {}).get("flow") or {}
+    if all(flow.get(c) for c in FLOW_AGE.values()):
+        tot_f = sum(flow[c] for c in FLOW_AGE.values())
+        cnt = Counter(age_of[i] for i in outsiders) or Counter(age_of.values())
+        tot_p = sum(cnt.values())
+        for a, c in FLOW_AGE.items():
+            if cnt.get(a):
+                age_w[a] = (flow[c] / tot_f) / (cnt[a] / tot_p)
+
+    # 사람별 방문 확률 (경쟁 반영 전 수요 기준). 낮 방문 비율은 나이대 배수만큼 달라짐
     scale_m = w["visit_distance_scale_m"]
     demand_prob = {}
     for p in people:
         i = p["id"]
         if interest[i] >= w["visit_interest_min"]:
-            demand_prob[i] = interest[i] * ((1 - p_day) * math.exp(-dist[i] / scale_m) + p_day)
+            pd_i = min(w.get("day_visit_cap", 0.0), p_day * age_w.get(age_of[i], 1.0))
+            demand_prob[i] = interest[i] * ((1 - pd_i) * math.exp(-dist[i] / scale_m) + pd_i)
     visit_prob = {i: v * comp for i, v in demand_prob.items()}
 
     # 가격·월세 (입력 없으면 동 평균 객단가, 월세는 입력값만)
     price = sc.get("avg_price") or (st or {}).get("avg_price") or w["default_avg_price"]
     rent = sc.get("rent")
-    cscale = w.get("customer_scale", 1.0)
+    cscale = w.get("customer_scale", 1.0) * f_days
+
+    def pick_day_seeds(s):
+        """낮 출발점: 다른 동 주민 중 그 동을 지나는 나이 구성에 맞춰 가중 추출"""
+        if not n_day:
+            return []
+        rng = random.Random(s)
+        pool = list(outsiders)
+        chosen = []
+        for _ in range(min(n_day, len(pool))):
+            weights = [age_w.get(age_of[i], 1.0) for i in pool]
+            j = rng.choices(range(len(pool)), weights=weights)[0]
+            chosen.append(pool.pop(j))
+        return sorted(chosen)
 
     # 시드 여러 개 실행 -> 평균과 범위, 애니메이션은 중앙값에 가장 가까운 실행
     rows = []
     for k_run in range(runs):
         s = seed + k_run
-        rng = random.Random(s)
-        day_seeds = sorted(rng.sample(outsiders, min(n_day, len(outsiders)))) if n_day else []
+        day_seeds = pick_day_seeds(s)
         seeds = sorted(set(base_seeds) | set(day_seeds))
-        steps, heard_week, fails = spread(people, adj, seeds, share, interest, w, rng, by_id)
+        steps, heard_week, fails = spread(people, adj, seeds, share, interest, w, s, by_id)
         demand = sum(demand_prob.get(i, 0) for i in heard_week)
         weekly_model, _ = weekly_visits(heard_week, visit_prob, revisit, w)
-        rows.append({"seed": s, "steps": steps, "heard_week": heard_week, "fails": fails,
+        rows.append({"seed": s, "seeds": seeds, "steps": steps, "heard_week": heard_week, "fails": fails,
                      "demand": demand, "visitors": demand * comp, "weekly_model": weekly_model,
                      "day_seeds": len(day_seeds)})
     vis = sorted(r["visitors"] for r in rows)
     median = vis[len(vis) // 2]
     main = min(rows, key=lambda r: (abs(r["visitors"] - median), r["seed"]))
-    weekly_model = [sum(r["weekly_model"][t] for r in rows) / runs for t in range(w["horizon_weeks"])]
+    H = w["horizon_weeks"]
+    weekly_model = [sum(r["weekly_model"][t] for r in rows) / runs for t in range(H)]
     weekly_real = [int(round(x * cscale)) for x in weekly_model]
 
-    # 추가 홍보: 소식이 멈추는 주에 seed_count명에게 다시 직접 알림 (대표 실행 기준)
-    rw = stall_week(main["heard_week"], w)
+    # 추가 홍보: 소식이 멈추는 주(실행들의 중앙값)에 관심 있는 미인지 시민 repromo_count명에게 다시 알림.
+    # 실행마다 같은 난수로 '했을 때 / 안 했을 때'를 비교해 평균 (추가 홍보가 손해로 나오지 않음)
     spw = w.get("steps_per_week", 1)
-    rng = random.Random(main["seed"])
-    day_seeds = sorted(rng.sample(outsiders, min(n_day, len(outsiders)))) if n_day else []
-    seeds = sorted(set(base_seeds) | set(day_seeds))
-    not_yet = sorted(i for i in by_id if i not in main["heard_week"] or main["heard_week"][i] >= rw)
-    # 추가 홍보 = 관심 있는 미인지 시민 중 가게 가까운 순으로 repromo_count명에게 직접 노출
-    pick = sorted((i for i in not_yet if interest[i] >= w["visit_interest_min"]), key=lambda i: (dist[i], i))[: w["repromo_count"]]
-    _, heard_with, _ = spread(people, adj, seeds, share, interest, w, rng, by_id, extra_at={rw * spw: pick})
-    with_model, _ = weekly_visits(heard_with, visit_prob, revisit, w)
-    without_real = [int(round(x * cscale)) for x in main["weekly_model"]]
+    rw = sorted(stall_week(r["heard_week"], w) for r in rows)[runs // 2]
+    with_model = [0.0] * H
+    for r in rows:
+        not_yet = [i for i in by_id if i not in r["heard_week"] or r["heard_week"][i] >= rw]
+        pick = sorted((i for i in not_yet if interest[i] >= w["visit_interest_min"]),
+                      key=lambda i: (dist[i], i))[: w["repromo_count"]]
+        _, heard_with, _ = spread(people, adj, r["seeds"], share, interest, w, r["seed"], by_id,
+                                  extra_at={rw * spw: pick})
+        wm, _ = weekly_visits(heard_with, visit_prob, revisit, w)
+        with_model = [a + b / runs for a, b in zip(with_model, wm)]
     with_real = [int(round(x * cscale)) for x in with_model]
+    without_real = weekly_real
 
     # 확산이 멈춘 집단: 인지율 10% 미만 + 가장 많이 실패한 경로 (대표 실행 기준)
     total, heard = Counter(), Counter()
@@ -363,11 +456,15 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
             "weekly_visits_model": [round(x, 3) for x in weekly_model],
             "monthly_customers": sum(weekly_real[-4:]),
             "breakeven_week": breakeven(weekly_real, price, rent, w),
-            "repromo": {"week": rw, "count": len(pick), "with": with_real, "without": without_real,
+            "repromo": {"week": rw, "count": w["repromo_count"], "with": with_real, "without": without_real,
                         "gain": sum(with_real) - sum(without_real)},
+            "open_hours": sc.get("open_hours"), "open_days": sc.get("open_days"),
+            "hours_factor": round(f_float, 3), "days_factor": round(f_days, 3),
+            "weekend_share": round(weekend_share, 3) if weekend_share is not None else None,
+            "day_age_mix": {a: round(v, 2) for a, v in age_w.items()},
             "assumptions": {"avg_price": int(price), "rent": rent, "gross_margin": w["gross_margin"],
                             "other_fixed_monthly": w.get("other_fixed_monthly", 0),
-                            "customer_scale": cscale},
+                            "customer_scale": w.get("customer_scale", 1.0)},
             "channel_share": None, "hubs": None, "scenarios": None, "budget_plan": None,
             "diagnosis": None}
 
