@@ -17,7 +17,10 @@ import pydeck as pdk
 import streamlit as st
 import streamlit.components.v1 as components
 
-from frontend.data_io import DataContractError, exposed_until, load_dataset
+from frontend.data_io import DataContractError, exposed_until, load_dataset, read_personas, read_reactions
+from frontend.v6_display import (DAYS, V6_KEYS, series_for_regions, channel_total_frame,
+    visits_range, assumptions_frame, open_scenario, notes_payload,
+    load_results_without_links, ad_costs_frame)
 from frontend.animated_map import build_map_html
 from frontend.ui_theme import get_css
 from frontend.final_preview import preview_fields, preview_only_keys
@@ -125,8 +128,10 @@ with st.sidebar:
     preview_new_sections = st.checkbox("최종 기능 예시 차트 표시", value=False,
                                        disabled=not (demo or fallback_demo),
                                        help="12주 곡선·채널별 유입·홍보 비교·허브의 예시를 화면에서만 표시합니다. 원본 데이터와 다운로드 결과는 유지합니다.")
-    supplied_result_file = st.file_uploader("팀장님 결과 JSON 임시 확인 (선택)", type=["json"],
-                                            help="파일을 서버 디스크에 저장하지 않고, 현재 후보 지역의 새 결과 필드만 미리 보여줍니다.")
+    supplied_result_files = st.file_uploader(
+        "최신 엔진 v6 결과 JSON 임시 확인 (선택·복수)", type=["json"],
+        accept_multiple_files=True,
+        help="지역별 result_*.json 3개를 함께 선택해 새 결과 지표·곡선을 확인할 수 있습니다. 원본 지도/다운로드 결과는 바꾸지 않습니다.")
     folder = ROOT / "frontend" / "data" / ("demo" if demo else "real")
     if demo:
         st.warning("DEMO · 결과 수치·시민·경계는 시연을 위한 가상 데이터입니다.")
@@ -145,10 +150,12 @@ with st.sidebar:
     st.divider()
     st.caption("파일을 추가하거나 변경했다면 앱을 새로고침하세요. 비밀키나 개인정보를 GitHub에 올리지 마세요.")
 
+map_links_valid = True
 try:
     dataset = load_dataset(folder)
 except DataContractError as exc:
-    st.error(f"실데이터 연결 실패: {exc}")
+    st.error(f"실데이터 연결 검사: {exc}")
+    map_links_valid = False
     if not demo:
         with st.expander("현재 실데이터 진단 보기", expanded=True):
             details = inspect_data_contract(folder)
@@ -159,9 +166,26 @@ except DataContractError as exc:
         folder = ROOT / "frontend" / "data" / "demo"
         dataset = load_dataset(folder)
         demo = True
-        st.warning("⚠ 샘플 UI로 대체 표시 중입니다. 아래 지도·결과는 서울 실데이터가 아닌 데모이며 실데이터 분석으로 사용하면 안 됩니다.")
+        map_links_valid = True
+        st.warning("⚠ 샘플 UI로 대체 표시 중입니다. 아래 지도·결과는 서울 실데이터가 아닌 데모입니다.")
+    elif not demo:
+        # Preserve read-only model result graphs without making up a map ID mapping.
+        result_only = load_results_without_links(folder)
+        if not result_only:
+            st.info("실데이터 결과 파일이 없습니다. 왼쪽에서 샘플 데이터를 선택해 주세요.")
+            st.stop()
+        try:
+            people_only = read_personas(folder)
+        except DataContractError:
+            people_only = pd.DataFrame(columns=["id","dong_code","lat","lng","dong","group"])
+        try:
+            reactions_only = read_reactions(folder, people_only)
+        except DataContractError:
+            reactions_only = []
+        dataset = {"persons": people_only, "reactions": reactions_only, "results": result_only,
+                   "geo": None, "validations": []}
+        st.warning("확산 지도만 비활성화하고 엔진 결과의 분석 화면은 읽기 전용으로 표시합니다. 시민 ID 대응 관계가 검증되기 전에는 지도 점과 결과를 연결하지 않습니다.")
     else:
-        st.info("왼쪽에서 샘플 데이터 또는 '실데이터가 오류여도 샘플 UI 표시'를 선택해 입력 화면과 최종 UI를 확인할 수 있습니다.")
         st.stop()
 
 people = dataset["persons"]
@@ -210,9 +234,10 @@ with primary_col:
             target = st.text_input("타깃 고객 (선택)", placeholder="예: 대학생·20대 직장인")
             price = st.text_input("가격대 (선택)", placeholder="예: 디저트 5천~9천 원")
 
-        with st.expander("선택 입력 · 영업시간 / 월세 / 객단가 / 홍보 예산", expanded=True):
+        with st.expander("선택 입력 · 영업시간 / 영업 요일 / 월세 / 객단가 / 홍보 예산", expanded=True):
             st.caption("입력하지 않아도 기존 시뮬레이션 결과를 확인할 수 있습니다. 값을 바꿔도 엔진이 다시 실행되지는 않습니다.")
-            hours_enabled = st.checkbox("영업시간 입력", value=False, help="입력할 때만 선택하세요. 팀의 scenario.json 영업시간 필드명은 합의가 필요합니다.")
+            hours_enabled = st.checkbox("영업시간 입력 (open_hours)", value=False,
+                                        help="엔진 규격: [시작 시각, 종료 시각] 정수 쌍. 자정 넘기는 영업은 현재 지원되지 않습니다.")
             hours_col1, hours_col2 = st.columns(2)
             with hours_col1:
                 opened_at = st.time_input("영업 시작", value=time(10, 0), disabled=not hours_enabled, step=1800)
@@ -228,8 +253,21 @@ with primary_col:
             with money_col3:
                 budget = st.number_input("홍보 예산 (원)", min_value=0, value=None, step=100_000,
                                          placeholder="선택 입력")
-            business_hours = {"open": opened_at.strftime("%H:%M"), "close": closed_at.strftime("%H:%M")} if hours_enabled else None
-            st.caption("영업시간·월세·객단가·예산은 현재 화면에서 입력값으로만 보관합니다. 재계산은 팀장님의 시뮬레이션 엔진 연결 후 가능합니다.")
+            days_enabled = st.checkbox("영업 요일 입력 (open_days)", value=False,
+                                      help="체크한 요일만 여는 설정입니다. 엔진은 월·화·수·목·금·토·일을 읽습니다.")
+            open_days = st.multiselect("영업 요일", options=list(DAYS), default=list(DAYS),
+                                       disabled=not days_enabled)
+            engine_hours = None
+            if hours_enabled:
+                if opened_at.minute or closed_at.minute:
+                    st.error("엔진 v6은 시간 단위 [10, 22]를 받습니다. 분 단위 설정은 현재 적용되지 않습니다.")
+                elif opened_at.hour >= closed_at.hour:
+                    st.error("엔진 v6은 종료 시각이 시작 시각보다 뒤인 당일 영업만 지원합니다.")
+                else:
+                    engine_hours = (opened_at.hour, closed_at.hour)
+            if days_enabled and not open_days:
+                st.warning("영업 요일을 하나 이상 선택해야 합니다.")
+            st.caption("엔진에서 계산하려면 scenario.json을 반영하고 결과를 다시 생성해야 합니다. 현재는 이미 계산된 파일을 보여줍니다.")
 if cream_theme and helper_col is not None:
     with helper_col:
         st.markdown('''<div class="nj-overview">
@@ -253,13 +291,20 @@ with left_button:
         st.session_state["opened"] = True
 with right_notice:
     st.caption("현재는 계산된 결과를 여는 동작입니다. 입력값을 바꾸어도 재계산하지 않습니다.")
-    # Existing scenario.json keys stay intact; business_hours is proposed and
-    # must be agreed with the PM before using it in the engine.
-    payload = scenario_payload(idea=idea, selected=[base_results[c]["dong"] for c in selected],
-                               hours=business_hours, rent=rent, avg_price=avg_price, budget=budget)
-    st.download_button("입력 조건 JSON 내려받기", data=json.dumps(payload, ensure_ascii=False, indent=2),
-                       file_name="norunja_scenario_input.json", mime="application/json",
-                       help="현재 계산 결과가 아니라 입력 조건을 인수인계하는 파일입니다. business_hours는 합의 전 제안 필드입니다.")
+    if (not hours_enabled or engine_hours is not None) and (not days_enabled or bool(open_days)):
+        engine_scenario = open_scenario(
+            idea=idea, codes=selected, open_hours=engine_hours,
+            open_days=open_days if days_enabled else None,
+            rent=rent, avg_price=avg_price, budget=budget)
+        st.download_button("엔진용 scenario.json 내려받기",
+                           data=json.dumps(engine_scenario, ensure_ascii=False, indent=2),
+                           file_name="scenario.json", mime="application/json",
+                           help="엔진이 실제로 읽는 키 open_hours/open_days/avg_price/rent를 사용합니다. 적용 및 재계산은 팀장이 결정합니다.")
+    memo = notes_payload(idea=idea, codes=selected, budget=budget, target=target, price_band=price)
+    st.download_button("아이디어·홍보예산 메모 JSON",
+                       data=json.dumps(memo, ensure_ascii=False, indent=2),
+                       file_name="norunja_input_notes.json", mime="application/json",
+                       help="엔진이 이 메모를 자동으로 읽지는 않습니다.")
 
 if cream_theme and not st.session_state.get("opened", False):
     st.markdown('''<div class="nj-mini-grid">
@@ -302,7 +347,30 @@ if scenarios:
 else:
     st.markdown('<div class="ls-note">변경 전·후 비교는 아직 미연동입니다. PM이 수정안을 다시 계산한 결과를 <code>frontend/data/real/scenarios/</code>에 넣으면 비교 기능이 나타납니다.</div>', unsafe_allow_html=True)
 
+preview_uploaded_by_code = {}
+for uploaded in supplied_result_files or []:
+    if uploaded.size > 2_000_000:
+        st.warning(f"{uploaded.name}: 2MB보다 커서 미리보기에 사용하지 않습니다.")
+        continue
+    try:
+        obj = json.loads(uploaded.getvalue().decode('utf-8-sig'))
+        if isinstance(obj, dict) and obj.get('dong_code') is not None:
+            preview_uploaded_by_code[str(obj['dong_code'])] = obj
+    except (UnicodeDecodeError, ValueError):
+        st.warning(f"{uploaded.name}: JSON 읽기 오류")
+
+def show_result(code):
+    original = active_results[code]
+    item = original
+    if demo and preview_new_sections:
+        item = {**item, **preview_fields()}
+    incoming = preview_uploaded_by_code.get(str(code))
+    if incoming is not None:
+        item = {**item, **{key: incoming[key] for key in V6_KEYS if key in incoming}}
+    return item
+
 items = [active_results[x] for x in selected]
+view_items = [show_result(x) for x in selected]
 summary = summaries(items, len(people))
 leader = summary.iloc[0].to_dict()
 
@@ -320,7 +388,8 @@ with tab_map:
     with row_cols[2]:
         card("1위 · 소식 도달 시민", f'{int(leader["exposed"]):,}명', "중복 제외, 가상 시민 기준")
     with row_cols[3]:
-        card("1위 · 가상 시민 도달률", f'{leader["exposure_ratio"]:.1f}%', f'전체 {len(people):,}명 기준')
+        card("1위 · 가상 시민 도달률", f'{leader["exposure_ratio"]:.1f}%' if map_links_valid else "연결 확인 필요",
+             f'전체 {len(people):,}명 기준' if map_links_valid else "ID 연결 전 비율 표시 제한")
 
     heading("03" if not scenarios else "04", "입소문 확산 시각화", "회색 = 미노출 · 민트 = 이전 단계 노출 · 주황 = 이번 단계 새로 소식을 들은 시민")
     region_col, mode_col, view_col = st.columns([1.3, 1, 1.0], gap="medium")
@@ -334,28 +403,14 @@ with tab_map:
                                     help="동을 바꾸면 선택한 동 중심으로 이동합니다. 전체 동 보기에서는 모든 시민의 위치가 한 화면에 보입니다.")
     focus_mode = "selected" if focus_choice == "선택 동 확대" else "all"
     result = active_results[region]
-    # Never mutate the underlying JSON result or export sample-only previews.
-    display_result = result
+    display_result = show_result(region)
     if demo and preview_new_sections:
-        display_result = {**display_result, **preview_fields()}
-        st.warning("새 기능 예시 차트 표시 중 · 노란색 예시 수치는 실제 분석 결과가 아닙니다. 원본 결과 파일과 다운로드에는 반영되지 않습니다.")
-    if supplied_result_file is not None:
-        try:
-            if supplied_result_file.size > 2_000_000:
-                st.warning("업로드한 결과 JSON이 2MB보다 커서 임시 미리보기에 사용하지 않았습니다.")
-            else:
-                supplied_obj = json.loads(supplied_result_file.getvalue().decode("utf-8-sig"))
-                if not isinstance(supplied_obj, dict):
-                    st.warning("업로드 결과는 하나의 JSON 객체여야 합니다.")
-                elif str(supplied_obj.get("dong_code")) != str(result["dong_code"]):
-                    st.info("임시 결과 JSON의 dong_code가 현재 선택 지역과 다릅니다. 맞는 지역을 선택하면 반영됩니다.")
-                else:
-                    fields = preview_only_keys()
-                    display_result = {**display_result, **{key: supplied_obj[key] for key in fields if key in supplied_obj}}
-                    st.info("업로드 결과의 신규 필드만 미리 보여줍니다. 지도·기존 방문자 수·CSV/JSON 다운로드는 원본 그대로입니다.")
-        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            st.warning(f"입력한 결과 JSON을 읽지 못했습니다: {exc}")
-    if not result["steps"]:
+        st.warning("시각화용 예시 수치입니다. 실제 팀의 엔진 계산 결과가 아니며 원본 다운로드에 반영되지 않습니다.")
+    if region in preview_uploaded_by_code:
+        st.info("이 지역의 엔진 v6 새 필드를 임시 확인 중입니다. 원본 지도·순위·다운로드 결과와 구분하세요.")
+    if not map_links_valid:
+        st.warning("지도 표시 중지: 페르소나와 확산 단계 시민 ID 연결이 검증되지 않았습니다. 분석 탭의 그래프와 수치는 확인할 수 있습니다.")
+    elif not result["steps"]:
         st.warning("확산 단계 데이터가 비어 있습니다. PM의 JSON을 확인하세요.")
     else:
         if map_mode == "인터랙티브 애니메이션":
@@ -460,7 +515,36 @@ with tab_forecast:
         else:
             st.info("선택 지역의 공공데이터가 아직 없습니다.")
 
-    heading("06", "12주 방문객 곡선 · 손익분기", "주별 방문 수치가 들어오면 그래프를 표시합니다. 확산 단계와 실제 주차를 혼동하지 않습니다.")
+    heading("06", "12주 방문객 곡선 · 손익분기",
+            "후보 지역 1~3개의 주별 방문 곡선을 겹쳐 비교합니다. 원본 엔진 수치이며 지역별 예측은 독립적입니다.")
+    combined_df = series_for_regions(view_items)
+    if combined_df.empty:
+        st.info("세 후보 지역 12주 방문객 데이터 대기 중 · weekly_visitors를 확인하세요.")
+    else:
+        st.markdown("**후보 지역별 12주 방문 고객 추이 (같은 그래프)**")
+        fig_regions = go.Figure()
+        region_colors = ['#D49B16' if cream_theme else '#F6C543', '#667D90', '#AAB5BD']
+        for i, name in enumerate(combined_df['dong'].unique()):
+            subset = combined_df[combined_df['dong'] == name]
+            fig_regions.add_trace(go.Scatter(
+                x=subset['week'], y=subset['visitors'], mode='lines+markers',
+                name=str(name), line={'width':3,'color':region_colors[i % len(region_colors)]},
+                hovertemplate='%{x}주차 · %{y:,.0f}명<extra>' + safe(name) + '</extra>'))
+        fig_regions.update_layout(
+            height=350, margin={'l':6,'r':12,'t':20,'b':25},
+            font={'color':chart_ink},
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            legend={'orientation':'h','y':1.14},
+            xaxis={'title':'오픈 후 주차','dtick':1,'gridcolor':chart_grid},
+            yaxis={'title':'주별 모델 방문 고객 수','gridcolor':chart_grid})
+        st.plotly_chart(fig_regions, use_container_width=True, config={'displayModeBar':False})
+    monthly_cards = st.columns(len(view_items))
+    for col, item in zip(monthly_cards, view_items):
+        with col:
+            n = finite_number(item.get('monthly_customers'))
+            card(f"{item['dong']} · 3달째 월 고객", f"{n:,.0f}명" if n is not None else "자료 대기",
+                 "최근 4주 고객 합계 · 엔진 계산값")
+
     week_df = weekly_frame(display_result)
     re_df = repromo_frame(display_result)
     weekly_left, weekly_right = st.columns([1.65, 1], gap="large")
@@ -497,7 +581,25 @@ with tab_forecast:
         note("월세와 객단가만으로는 정확한 손익분기를 계산할 수 없습니다. 인건비·원가·기타 고정비 등의 가정과 산식은 엔진 팀의 확인이 필요합니다.", warning=True)
 
 with tab_marketing:
-    heading("07", "채널별 유입 비율", "소식을 들은 경로를 집단별로 비교합니다. 값이 없을 때는 비율을 만들지 않습니다.")
+    heading("07", "채널별 유입 비율", "전체 유입 경로와 집단별 경로를 분리해서 보여줍니다.")
+    total_channel_df = channel_total_frame(display_result)
+    if total_channel_df.empty:
+        st.info("전체 유입 경로 자료 대기 중 · channel_total 필드가 필요합니다.")
+    else:
+        st.markdown("**전체 유입 경로 비율 (channel_total)**")
+        fig_all_channels = go.Figure(go.Bar(
+            x=total_channel_df['percent'], y=total_channel_df['channel'], orientation='h',
+            marker_color='#D49B16' if cream_theme else '#FFCA39',
+            hovertemplate='%{y}: %{x:.1f}%<extra></extra>'))
+        fig_all_channels.update_layout(height=max(240, len(total_channel_df)*45+60),
+            margin={'l':5,'r':12,'t':10,'b':25},
+            paper_bgcolor='rgba(0,0,0,0)',plot_bgcolor='rgba(0,0,0,0)',
+            font={'color':chart_ink},xaxis={'range':[0,100], 'gridcolor':chart_grid,
+                'title':'유입 경로 비율 (%)'},yaxis={'title':''})
+        st.plotly_chart(fig_all_channels, use_container_width=True,
+                        config={'displayModeBar':False})
+        st.caption('전체 경로 비율은 계산된 집단별 평균이 아니라 엔진 channel_total 원본입니다.')
+    st.markdown("**집단별 유입 경로 (channel_share)**")
     channel_df = channel_frame(display_result)
     if channel_df.empty:
         st.info("채널별 유입 데이터 대기 중 · channel_share가 추가되면 집단별 비교 그래프가 표시됩니다.")
@@ -512,7 +614,7 @@ with tab_marketing:
         fig_ch.update_layout(barmode="stack", height=max(285, 55 * len(pv) + 120),
                              margin={"l": 0, "r": 8, "t": 12, "b": 22},
                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                             font={"color": "#DAE7EF"}, legend={"orientation": "h", "y": -0.15},
+                             font={"color": chart_ink}, legend={"orientation": "h", "y": -0.15},
                              xaxis={"title": "경로별 인지 비율 (%)", "range": [0, 100], "gridcolor": chart_grid},
                              yaxis={"title": ""})
         st.plotly_chart(fig_ch, use_container_width=True, config={"displayModeBar": False})
@@ -554,6 +656,15 @@ with tab_marketing:
             if budget is not None and planned is not None and float(budget) != planned:
                 st.warning("현재 입력한 홍보 예산과 저장된 엔진 결과의 예산이 다릅니다. 재시뮬레이션 전에는 추천안이 바뀌지 않습니다.")
     st.caption("광고 비용은 수집한 단가, 광고 효과는 가정값일 수 있습니다. 실제 광고 효율·매출 보장을 의미하지 않습니다.")
+    with st.expander("광고 단가 원본 확인 · ad_costs.json (선택)", expanded=False):
+        ad_rows = ad_costs_frame(folder)
+        if ad_rows.empty:
+            st.info("ad_costs.json 파일이 아직 없습니다. 팀원이 업데이트한 최신 파일을 가져오면 표시됩니다.")
+        else:
+            only_default = st.checkbox("기본 상품만 보기", value=True)
+            table_rows = ad_rows[ad_rows['기본 상품']] if only_default else ad_rows
+            st.dataframe(table_rows, hide_index=True, use_container_width=True)
+            st.caption("단가 기준값은 cost_per_unit, 불확실한 범위는 cost_min/cost_max, 추정 여부는 is_estimated입니다. 단가만으로 실제 광고 효과를 계산하지 않습니다.")
 
     heading("09", "입소문 허브 페르소나", "가게 소식을 널리 전달할 가능성이 높은 가상 시민을 카드로 보여줍니다.")
     hubs_df = hubs_frame(display_result)
@@ -561,12 +672,21 @@ with tab_marketing:
         st.info("입소문 허브 데이터 대기 중 · hubs가 들어오면 페르소나 카드가 표시됩니다.")
     else:
         hubs_columns = st.columns(min(3, len(hubs_df)))
-        for i, (_, hub) in enumerate(hubs_df.iterrows()):
+        for i, (_, hub) in enumerate(hubs_df.head(5).iterrows()):
             with hubs_columns[i % len(hubs_columns)]:
                 reach = finite_number(hub["reach"])
-                card(f"가상 시민 #{hub['id']}", hub["group"],
-                     f"{hub['dong']} · 이 사람을 통해 전달된 시민 " +
+                card(f"가상 시민 #{hub['id']}", hub['group'],
+                     f"{hub['dong']} · 입소문 전달 " +
                      (f"{int(reach):,}명" if reach is not None else "집계 대기"))
+                extra = []
+                if finite_number(hub.get('direct')) is not None:
+                    extra.append(f"직접 전달 {int(hub['direct'])}명")
+                if finite_number(hub.get('week')) is not None:
+                    extra.append(f"최초 활동 {int(hub['week'])}주차")
+                if isinstance(hub.get('community'), list):
+                    extra.append('채널 ' + ', '.join(str(x) for x in hub['community'][:3]))
+                if extra:
+                    st.caption(' · '.join(extra))
         st.caption("허브는 가상 관계망에 기반한 시뮬레이션 결과로, 실제 개인이나 실제 고객을 지칭하지 않습니다.")
 
 with tab_report:
@@ -615,7 +735,27 @@ with tab_report:
         else:
             st.info("reactions.json 파일이 아직 없습니다.")
 
-    heading("11", "결과 리포트와 검증 이력", "보고서에 사용할 때는 반드시 데모 여부·데이터 출처·검증 한계를 함께 제시해 주세요.")
+    heading("11", "결과 리포트와 검증 이력", "수치 범위·계산 가정·시드 수와 데이터 출처를 함께 제시합니다.")
+    st.markdown("**현재 지역 결과의 범위·가정**")
+    mnmx = visits_range(display_result)
+    if mnmx:
+        st.metric("방문 가능 고객 결과 범위 (시드 반복)", f"{mnmx[0]:,.0f} ~ {mnmx[1]:,.0f}명")
+    else:
+        st.info("visitors_range 자료 대기 중")
+    if finite_number(display_result.get('runs')) is not None:
+        st.caption(f"시드 반복 횟수: {int(display_result['runs'])}회")
+    assumptions_df = assumptions_frame(display_result)
+    if assumptions_df.empty:
+        st.info("assumptions 자료 대기 중")
+    else:
+        st.markdown("**엔진 계산 가정(원본)**")
+        st.dataframe(assumptions_df.rename(columns={'key':'필드','value':'원본 값'}),
+                     hide_index=True, use_container_width=True)
+        st.caption("rent가 null이면 임대료 미반영 가능성이 있습니다. 손익분기 null은 임의의 주차로 대체하지 않습니다.")
+    applied_hours = display_result.get('open_hours')
+    applied_days = display_result.get('open_days')
+    st.caption(f"결과에 적용된 영업시간: {applied_hours if applied_hours is not None else '미설정'} · "
+               f"영업 요일: {', '.join(applied_days) if isinstance(applied_days, list) else '미설정'}")
     report_df = summary_export(items, len(people))
     with st.expander("지역별 상세 수치", expanded=True):
         st.dataframe(report_df, hide_index=True, use_container_width=True)

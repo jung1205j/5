@@ -115,15 +115,18 @@ def budget_split(result: Mapping[str, Any]) -> tuple[pd.DataFrame, dict]:
 def hubs_frame(result: Mapping[str, Any]) -> pd.DataFrame:
     obj = result.get("hubs")
     if not isinstance(obj, list):
-        return pd.DataFrame(columns=["id", "group", "dong", "reach"])
+        return pd.DataFrame(columns=["id", "group", "dong", "reach", "direct", "week", "community"])
     rows = []
     for hub in obj:
         if not isinstance(hub, dict):
             continue
         reach = finite_number(hub.get("reach"))
         rows.append({"id": str(hub.get("id", "-")), "group": str(hub.get("group", "미상")),
-                     "dong": str(hub.get("dong", "미상")), "reach": reach})
-    return pd.DataFrame(rows, columns=["id", "group", "dong", "reach"])
+                     "dong": str(hub.get("dong", "미상")), "reach": reach,
+                     "direct": finite_number(hub.get("direct")),
+                     "week": finite_number(hub.get("week")),
+                     "community": hub.get("community") if isinstance(hub.get("community"), list) else []})
+    return pd.DataFrame(rows, columns=["id", "group", "dong", "reach", "direct", "week", "community"])
 
 
 def scenario_payload(*, idea: str, selected: list[str], hours: dict | None,

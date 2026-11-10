@@ -21,6 +21,6 @@ def test_light_theme_makes_no_model_changes():
     root=Path(__file__).resolve().parents[2]
     body=(root/"app.py").read_text(encoding="utf-8")
     assert 'theme_choice == "노른자 크림(추천)"' in body
-    assert 'display_result = result' in body
-    assert 'scenario_payload(' in body
+    assert 'display_result = show_result(region)' in body
+    assert 'open_scenario(' in body
     assert 'build_map_html(' in body
