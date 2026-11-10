@@ -1,5 +1,5 @@
 {
-  "version": "weights_v5",
+  "version": "weights_v6",
   "neighbor_radius_m": 500,
   "neighbor_max": 8,
   "path_weight": {
@@ -17,7 +17,7 @@
   "community_radius_m": {
     "당근": 1500
   },
-  "transmission_scale": 0.44,
+  "transmission_scale": 0.3,
   "sim_radius_m": 3000,
   "day_seeds_per_million_floating": 0.3,
   "day_seeds_per_1000_workers": 0.2,
@@ -38,7 +38,7 @@
   "gross_margin": 0.6,
   "other_fixed_monthly": 5000000,
   "default_avg_price": 6800,
-  "customer_scale": 33.6,
+  "customer_scale": 32.05,
   "steps_per_week": 2,
   "calibration_target_ratio": 0.7,
   "reference_hours": [
@@ -48,5 +48,12 @@
   "work_hours": [
     9,
     18
-  ]
+  ],
+  "discovery_default": 0.2,
+  "search_base": 0.1,
+  "review_rate": 0.3,
+  "review_half": 5,
+  "walk_base": 0.15,
+  "walk_distance_scale_m": 400,
+  "hub_top": 5
 }

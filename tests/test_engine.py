@@ -1,4 +1,4 @@
-"""확산 엔진 동작 검증 테스트 (상식 테스트 11개)
+"""확산 엔진 동작 검증 테스트 (상식 테스트 13개)
 
 실행 (저장소 맨 위에서):  python tests/test_engine.py
 pytest가 있으면:          pytest tests/test_engine.py
@@ -132,10 +132,10 @@ def test_interest_fades_over_time():
 
 
 def test_repromo_never_hurts():
-    """8) 소식이 멈출 때 추가 홍보를 하면 어느 주에도 방문객이 줄지 않는다"""
+    """8) 소식이 멈출 때 추가 홍보를 하면 12주 전체 방문객이 줄지 않는다 (일찍 알게 된 만큼 주별로는 앞당겨질 수 있음)"""
     r = run_with_stats(make_stats())
     rp = r["repromo"]
-    assert all(a >= b for a, b in zip(rp["with"], rp["without"])), f"추가 홍보 {rp['with']} / 없음 {rp['without']}"
+    assert sum(rp["with"]) >= sum(rp["without"]), f"추가 홍보 {sum(rp['with'])} < 없음 {sum(rp['without'])}"
 
 
 def test_higher_rent_later_breakeven():
@@ -168,12 +168,37 @@ def test_closed_days_fewer_customers():
     assert all_days == 1.0 and no_sun < no_mon < all_days, f"전체 {all_days}, 일 휴무 {no_sun:.2f}, 월 휴무 {no_mon:.2f}"
 
 
+def test_no_reviews_little_search():
+    """12) 후기가 쌓이지 않으면(후기 작성률 0) 검색으로 알게 되는 사람이 거의 없다"""
+    w, people, reactions = load_weights(), make_people(), make_reactions(interest=4)
+    for g in reactions:
+        reactions[g]["discovery"] = {"네이버검색": 0.6, "인스타": 0.1, "지인": 0.1, "지나가다": 0.1, "당근커뮤니티": 0.1}
+    edges = eng.build_neighbor_edges(people, w["neighbor_radius_m"], w["neighbor_max"])
+
+    def search_count(rate):
+        w2 = dict(w, review_rate=rate)
+        r = eng.simulate(DONG, "테스트동", people, edges, reactions, make_geo(CENTER), w2, 42)
+        return r["channel_total"].get("검색", 0)
+    none, some = search_count(0.0), search_count(0.5)
+    assert none == 0 and some > 0, f"후기 없음 {none}, 후기 있음 {some}"
+
+
+def test_hub_reach_consistent():
+    """13) 입소문 허브는 전한 인원(reach) 순으로 정렬되고, 직접 전한 사람 수보다 reach가 작지 않다"""
+    r = run_with_stats(make_stats())
+    hubs = r["hubs"]
+    assert hubs, "허브가 하나도 없음"
+    assert all(a["reach"] >= b["reach"] for a, b in zip(hubs, hubs[1:])), "reach 순서가 아님"
+    assert all(h["reach"] >= h["direct"] >= 1 for h in hubs), f"reach/direct 이상 {hubs}"
+
+
 if __name__ == "__main__":
     tests = [test_no_interest_no_spread, test_more_interest_more_spread,
              test_farther_store_fewer_visitors, test_same_seed_same_result,
              test_more_floating_more_day_visitors, test_more_competition_fewer_visitors,
              test_interest_fades_over_time, test_repromo_never_hurts, test_higher_rent_later_breakeven,
-             test_evening_hours_favor_night_dong, test_closed_days_fewer_customers]
+             test_evening_hours_favor_night_dong, test_closed_days_fewer_customers,
+             test_no_reviews_little_search, test_hub_reach_consistent]
     failed = 0
     for t in tests:
         try:

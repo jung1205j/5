@@ -228,12 +228,18 @@ def coin(seed, a, b):
     return x / 2 ** 64
 
 
-def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None):
-    """한 주에 steps_per_week 단계. 새로 들은 사람은 연결된 사람마다 한 번씩 전할 기회.
+def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None, ctx=None, seed_channel=None):
+    """한 주에 steps_per_week 단계. 소식이 닿는 경로는 세 가지.
+    - 입소문: 새로 들은 사람은 연결된 사람마다 한 번씩 전할 기회 (경로 = 관계망 type)
+    - 검색: 아직 모르는 사람이 매 단계 검색으로 발견. 집단의 검색 성향 x 관심도 x 지금까지 쌓인 후기 수
+    - 지나가다: 가게 근처에 살거나 낮에 그 동을 지나는 사람이 매 단계 가게를 직접 발견. 집단의 '지나가다' 성향 x 영업시간 유동인구
     extra_at={단계: [id,...]} 이면 그 단계에 추가 홍보로 소식을 직접 들은 사람을 더함.
-    반환: steps(단계별 새로 들은 id), heard_week{id: 주차}, fails"""
+    반환: steps, heard_week{id: 주차}, fails, channel{id: 경로}, parent{id: 전해준 사람}"""
+    ctx = ctx or {}
     informed = set(seeds)
     heard_week = {i: 0 for i in seeds}
+    channel = {i: (seed_channel or {}).get(i, "지나가다") for i in seeds}
+    parent = {}
     steps = [sorted(seeds)]
     fails = Counter()
     frontier = sorted(seeds)
@@ -241,6 +247,11 @@ def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None):
     extra_at = extra_at or {}
     spw = w.get("steps_per_week", 1)
     max_steps = w["horizon_weeks"] * spw
+    d = w["interest_decay"]
+    vprob = ctx.get("visit_prob", {})
+    search_p = ctx.get("search_p", {})   # 사람별 '후기가 충분할 때' 단계당 검색 발견 확률
+    walk_p = ctx.get("walk_p", {})       # 사람별 단계당 지나가다 발견 확률
+    candidates = sorted(i for i in by_id if search_p.get(i, 0) > 0 or walk_p.get(i, 0) > 0)
     while len(steps) < max_steps:
         step = len(steps)
         new = []
@@ -251,20 +262,62 @@ def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None):
                 if coin(seed, s, r) < scale * share[s] * interest[r] * w["path_weight"][path]:
                     informed.add(r)
                     new.append(r)
+                    channel[r] = path
+                    parent[r] = s
                 else:
                     fails[(by_id[r]["group"], path)] += 1
+        if candidates:
+            # 지금까지 쌓인 후기 (모델 단위): 소식 들은 사람들의 누적 첫 방문 기댓값 x 후기 작성률
+            week = step / spw
+            visits = sum(vprob.get(i, 0) * (1 - d ** max(week - h, 0)) for i, h in heard_week.items())
+            reviews = w.get("review_rate", 0) * visits
+            review_f = reviews / (reviews + w.get("review_half", 1)) if reviews > 0 else 0.0
+            for i in candidates:
+                if i in informed:
+                    continue
+                p_walk = walk_p.get(i, 0)
+                p_search = search_p.get(i, 0) * review_f
+                u = coin(seed, i, 10_000_000 + step)
+                if u < p_walk:
+                    ch = "지나가다"
+                elif u < p_walk + p_search:
+                    ch = "검색"
+                else:
+                    continue
+                informed.add(i)
+                new.append(i)
+                channel[i] = ch
         for r in extra_at.get(step, []):
             if r not in informed:
                 informed.add(r)
                 new.append(r)
-        if not new and not any(k > step for k in extra_at):
+                channel[r] = "추가홍보"
+        if not new and not candidates and not any(k > step for k in extra_at):
             break
         new = sorted(set(new))
         for r in new:
             heard_week[r] = step // spw
         steps.append(new)
         frontier = new
-    return steps, heard_week, fails
+    return steps, heard_week, fails, channel, parent
+
+
+def find_hubs(heard_week, parent, people_by_id, reactions, top):
+    """입소문 허브: 그 사람을 거쳐(자손 포함) 소식을 들은 인원(reach)이 많은 시민"""
+    children = defaultdict(list)
+    for c, p in parent.items():
+        children[p].append(c)
+    reach = {}
+    for i in sorted(heard_week, key=lambda i: -heard_week[i]):  # 늦게 들은 사람부터 올라가며 합산
+        reach[i] = sum(1 + reach.get(c, 0) for c in children.get(i, []))
+    ranked = sorted((i for i in reach if reach[i] > 0), key=lambda i: (-reach[i], i))[:top]
+    out = []
+    for i in ranked:
+        p = people_by_id[i]
+        out.append({"id": i, "group": p["group"], "dong": p["dong"], "reach": reach[i],
+                    "direct": len(children.get(i, [])), "week": heard_week[i],
+                    "community": [c for c in reactions.get(p["group"], {}).get("community", []) if c != "없음"]})
+    return out
 
 
 def weekly_visits(heard_week, visit_prob, revisit, w):
@@ -375,6 +428,21 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
             demand_prob[i] = interest[i] * ((1 - pd_i) * math.exp(-dist[i] / scale_m) + pd_i)
     visit_prob = {i: v * comp for i, v in demand_prob.items()}
 
+    # 검색·지나가다 발견 확률 (사람별, 단계당). 반응 파일에 discovery가 없으면 기본 비율
+    def disc(g, key):
+        return reactions.get(g, {}).get("discovery", {}).get(key, w["discovery_default"])
+    walk_scale = w["walk_distance_scale_m"]
+    search_p, walk_p = {}, {}
+    for p in people:
+        i = p["id"]
+        if interest[i] <= 0:
+            continue
+        search_p[i] = w["search_base"] * disc(p["group"], "네이버검색") * interest[i]
+        pd_i = min(w.get("day_visit_cap", 0.0), p_day * age_w.get(age_of[i], 1.0))
+        near = math.exp(-dist[i] / walk_scale) + pd_i * f_float
+        walk_p[i] = w["walk_base"] * disc(p["group"], "지나가다") * near
+    ctx = {"visit_prob": visit_prob, "search_p": search_p, "walk_p": walk_p}
+
     # 가격·월세 (입력 없으면 동 평균 객단가, 월세는 입력값만)
     price = sc.get("avg_price") or (st or {}).get("avg_price") or w["default_avg_price"]
     rent = sc.get("rent")
@@ -399,10 +467,11 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
         s = seed + k_run
         day_seeds = pick_day_seeds(s)
         seeds = sorted(set(base_seeds) | set(day_seeds))
-        steps, heard_week, fails = spread(people, adj, seeds, share, interest, w, s, by_id)
+        steps, heard_week, fails, channel, parent = spread(people, adj, seeds, share, interest, w, s, by_id, ctx=ctx)
         demand = sum(demand_prob.get(i, 0) for i in heard_week)
         weekly_model, _ = weekly_visits(heard_week, visit_prob, revisit, w)
         rows.append({"seed": s, "seeds": seeds, "steps": steps, "heard_week": heard_week, "fails": fails,
+                     "channel": channel, "parent": parent,
                      "demand": demand, "visitors": demand * comp, "weekly_model": weekly_model,
                      "day_seeds": len(day_seeds)})
     vis = sorted(r["visitors"] for r in rows)
@@ -421,8 +490,8 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
         not_yet = [i for i in by_id if i not in r["heard_week"] or r["heard_week"][i] >= rw]
         pick = sorted((i for i in not_yet if interest[i] >= w["visit_interest_min"]),
                       key=lambda i: (dist[i], i))[: w["repromo_count"]]
-        _, heard_with, _ = spread(people, adj, r["seeds"], share, interest, w, r["seed"], by_id,
-                                  extra_at={rw * spw: pick})
+        _, heard_with, _, _, _ = spread(people, adj, r["seeds"], share, interest, w, r["seed"], by_id,
+                                        extra_at={rw * spw: pick}, ctx=ctx)
         wm, _ = weekly_visits(heard_with, visit_prob, revisit, w)
         with_model = [a + b / runs for a, b in zip(with_model, wm)]
     with_real = [int(round(x * cscale)) for x in with_model]
@@ -438,6 +507,19 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
         if heard[g] / total[g] < w["stop_awareness_threshold"]:
             tried = [(n, path) for (grp, path), n in main["fails"].items() if grp == g]
             stopped_at.append({"group": g, "path": max(tried)[1] if tried else "동네"})
+
+    # 채널별 유입: 모든 실행을 합쳐 집단별로 어떤 경로로 들었는지 비율
+    ch_cnt = defaultdict(Counter)
+    for r in rows:
+        for i, ch in r["channel"].items():
+            ch_cnt[by_id[i]["group"]][ch] += 1
+    channel_share = {g: {ch: round(n / sum(c.values()), 3) for ch, n in c.most_common()}
+                     for g, c in sorted(ch_cnt.items())}
+    tot = Counter()
+    for c in ch_cnt.values():
+        tot.update(c)
+    channel_total = {ch: round(n / sum(tot.values()), 3) for ch, n in tot.most_common()}
+    hubs = find_hubs(main["heard_week"], main["parent"], by_id, reactions, w["hub_top"])
 
     mean = lambda xs: sum(xs) / len(xs)
     return {"dong_code": dong_code, "dong": dong, "seed": main["seed"], "steps": main["steps"],
@@ -465,7 +547,8 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
             "assumptions": {"avg_price": int(price), "rent": rent, "gross_margin": w["gross_margin"],
                             "other_fixed_monthly": w.get("other_fixed_monthly", 0),
                             "customer_scale": w.get("customer_scale", 1.0)},
-            "channel_share": None, "hubs": None, "scenarios": None, "budget_plan": None,
+            "channel_share": channel_share, "channel_total": channel_total, "hubs": hubs,
+            "scenarios": None, "budget_plan": None,
             "diagnosis": None}
 
 
