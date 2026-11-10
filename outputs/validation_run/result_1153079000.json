@@ -119,18 +119,47 @@
       15474,
       16462,
       24023
+    ],
+    [
+      338,
+      2286,
+      4807,
+      9621,
+      11536,
+      14517,
+      18547,
+      26351,
+      29469
+    ],
+    [
+      4202,
+      5601,
+      8022,
+      17636,
+      23448,
+      27360,
+      28324
+    ],
+    [
+      9716,
+      15678,
+      21466,
+      24413,
+      28012
+    ],
+    [
+      5932,
+      6333,
+      6838,
+      7384,
+      15554,
+      16117,
+      18609,
+      24856
     ]
   ],
-  "visitors": 11,
+  "visitors": 13,
   "stopped_at": [
-    {
-      "group": "20대이하_학생",
-      "path": "인스타"
-    },
-    {
-      "group": "30대_기타",
-      "path": "인스타"
-    },
     {
       "group": "30대_자영업",
       "path": "인스타"
@@ -138,10 +167,6 @@
     {
       "group": "30대_주부",
       "path": "당근"
-    },
-    {
-      "group": "30대_직장인",
-      "path": "인스타"
     },
     {
       "group": "50대이상_기타",
@@ -154,21 +179,89 @@
     {
       "group": "50대이상_주부",
       "path": "당근"
-    },
-    {
-      "group": "50대이상_직장인",
-      "path": "당근"
     }
   ],
-  "visitors_demand": 12,
+  "visitors_demand": 14,
+  "visitors_range": [
+    13,
+    13
+  ],
+  "runs": 1,
   "competition_factor": 0.884,
   "daytime_share": 0.021,
   "day_seeds": 1,
   "population_in_radius": 856,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "weekly_visits_model": [
+    1.683,
+    2.557,
+    2.197,
+    2.015,
+    1.646,
+    1.348,
+    1.115,
+    1.019,
+    0.989,
+    1.115,
+    1.49,
+    1.399
+  ],
+  "monthly_customers": 4,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 10,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2
+    ],
+    "without": [
+      2,
+      3,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "gain": 2
+  },
+  "assumptions": {
+    "avg_price": 6834,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

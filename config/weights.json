@@ -1,5 +1,5 @@
 {
-  "version": "weights_v3",
+  "version": "weights_v4",
   "neighbor_radius_m": 500,
   "neighbor_max": 8,
   "path_weight": {
@@ -10,7 +10,6 @@
     "인스타": 0.3
   },
   "seed_count": 5,
-  "max_steps": 20,
   "visit_interest_min": 0.5,
   "visit_distance_scale_m": 800,
   "stop_awareness_threshold": 0.1,
@@ -27,5 +26,19 @@
   "day_visit_per_1000_workers": 0.002,
   "day_visit_cap": 0.4,
   "competition_k": 45,
-  "competition_alpha": 0.3
+  "competition_alpha": 0.3,
+  "horizon_weeks": 12,
+  "runs": 5,
+  "interest_decay": 0.6,
+  "revisit_default": 3,
+  "revisit_rate_max": 0.3,
+  "revisit_retention": 0.85,
+  "repromo_trigger": 0.5,
+  "repromo_count": 5,
+  "gross_margin": 0.6,
+  "other_fixed_monthly": 5000000,
+  "default_avg_price": 6800,
+  "customer_scale": 42.82,
+  "steps_per_week": 2,
+  "calibration_target_ratio": 0.7
 }

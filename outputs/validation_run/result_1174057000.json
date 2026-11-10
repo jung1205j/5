@@ -652,9 +652,48 @@
       22727,
       25073,
       29973
+    ],
+    [
+      1877,
+      2985,
+      4223,
+      6731,
+      8070,
+      15827,
+      15964,
+      16996,
+      20749,
+      21457,
+      22193,
+      28668
+    ],
+    [
+      103,
+      697,
+      9227,
+      11056,
+      18259,
+      18973,
+      23911,
+      26172,
+      29707
+    ],
+    [
+      9159,
+      16351,
+      17552,
+      25863,
+      26415
+    ],
+    [
+      3567,
+      14045,
+      16258,
+      16966,
+      20771
     ]
   ],
-  "visitors": 83,
+  "visitors": 87,
   "stopped_at": [
     {
       "group": "20대이하_자영업",
@@ -665,15 +704,87 @@
       "path": "맘카페"
     }
   ],
-  "visitors_demand": 105,
+  "visitors_demand": 109,
+  "visitors_range": [
+    87,
+    87
+  ],
+  "runs": 1,
   "competition_factor": 0.797,
   "daytime_share": 0.092,
   "day_seeds": 3,
   "population_in_radius": 1304,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    4,
+    5,
+    7,
+    10,
+    14,
+    17,
+    17,
+    15,
+    13,
+    11
+  ],
+  "weekly_visits_model": [
+    1.615,
+    2.701,
+    4.006,
+    5.014,
+    7.293,
+    10.336,
+    14.235,
+    16.794,
+    17.171,
+    15.419,
+    13.033,
+    10.87
+  ],
+  "monthly_customers": 56,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 9,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      10,
+      14,
+      17,
+      17,
+      17,
+      14,
+      12
+    ],
+    "without": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      10,
+      14,
+      17,
+      17,
+      15,
+      13,
+      11
+    ],
+    "gain": 4
+  },
+  "assumptions": {
+    "avg_price": 6177,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

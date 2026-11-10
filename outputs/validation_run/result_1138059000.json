@@ -137,9 +137,60 @@
       16226,
       19502,
       22524
+    ],
+    [
+      4310,
+      7836,
+      8361,
+      11058,
+      12371,
+      19888,
+      29292
+    ],
+    [
+      1727,
+      4111,
+      7846,
+      8963,
+      19434,
+      21932,
+      27662,
+      28124,
+      29084
+    ],
+    [
+      80,
+      4249,
+      4514,
+      14754,
+      15886,
+      20332,
+      21445,
+      22315,
+      26845,
+      27218,
+      28505
+    ],
+    [
+      4966,
+      6431,
+      6894,
+      8542,
+      11552,
+      14114,
+      15698,
+      17842,
+      17892,
+      18198,
+      20804,
+      22441,
+      24702,
+      25649,
+      27068,
+      28896
     ]
   ],
-  "visitors": 11,
+  "visitors": 13,
   "stopped_at": [
     {
       "group": "20대이하_직장인",
@@ -150,24 +201,12 @@
       "path": "인스타"
     },
     {
-      "group": "30대_기타",
-      "path": "맘카페"
-    },
-    {
       "group": "30대_자영업",
       "path": "인스타"
     },
     {
-      "group": "30대_직장인",
-      "path": "맘카페"
-    },
-    {
       "group": "40대_기타",
-      "path": "동네"
-    },
-    {
-      "group": "40대_자영업",
-      "path": "동네"
+      "path": "인스타"
     },
     {
       "group": "40대_주부",
@@ -191,18 +230,90 @@
     },
     {
       "group": "50대이상_직장인",
-      "path": "당근"
+      "path": "맘카페"
     }
   ],
-  "visitors_demand": 12,
+  "visitors_demand": 15,
+  "visitors_range": [
+    13,
+    13
+  ],
+  "runs": 1,
   "competition_factor": 0.905,
   "daytime_share": 0.039,
   "day_seeds": 1,
   "population_in_radius": 1671,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    2
+  ],
+  "weekly_visits_model": [
+    1.558,
+    2.146,
+    1.998,
+    1.962,
+    1.883,
+    1.675,
+    1.516,
+    1.386,
+    1.158,
+    1.089,
+    1.232,
+    1.658
+  ],
+  "monthly_customers": 5,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 10,
+    "count": 5,
+    "with": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      3
+    ],
+    "without": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "gain": 2
+  },
+  "assumptions": {
+    "avg_price": 6800,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

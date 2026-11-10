@@ -1,4 +1,4 @@
-"""확산 엔진 동작 검증 테스트 (상식 테스트 6개)
+"""확산 엔진 동작 검증 테스트 (상식 테스트 9개)
 
 실행 (저장소 맨 위에서):  python tests/test_engine.py
 pytest가 있으면:          pytest tests/test_engine.py
@@ -122,10 +122,36 @@ def test_more_competition_fewer_visitors():
     assert many["visitors"] < few["visitors"], f"경쟁 적음 {few['visitors']}명, 많음 {many['visitors']}명"
 
 
+def test_interest_fades_over_time():
+    """7) 같은 주에 소식을 들은 사람들의 첫 방문은 시간이 지날수록 줄어든다 (관심이 식음)"""
+    w = load_weights()
+    heard = {i: 0 for i in range(100)}
+    prob = {i: 0.5 for i in range(100)}
+    _, first = eng.weekly_visits(heard, prob, {i: 0.0 for i in range(100)}, w)
+    assert all(first[t] > first[t + 1] for t in range(len(first) - 1)), f"첫 방문 {first}"
+
+
+def test_repromo_never_hurts():
+    """8) 소식이 멈출 때 추가 홍보를 하면 12주 방문객이 줄지 않는다"""
+    r = run_with_stats(make_stats())
+    rp = r["repromo"]
+    assert sum(rp["with"]) >= sum(rp["without"]), f"추가 홍보 {sum(rp['with'])} < 없음 {sum(rp['without'])}"
+
+
+def test_higher_rent_later_breakeven():
+    """9) 손님 흐름이 같으면 월세가 높을수록 손익분기가 늦어지거나 12주 안에 안 온다"""
+    w = load_weights()
+    weekly = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
+    low = eng.breakeven(weekly, 7000, 1_000_000, w)
+    high = eng.breakeven(weekly, 7000, 6_000_000, w)
+    assert low is not None and (high is None or high > low), f"월세 100만 {low}주차, 600만 {high}주차"
+
+
 if __name__ == "__main__":
     tests = [test_no_interest_no_spread, test_more_interest_more_spread,
              test_farther_store_fewer_visitors, test_same_seed_same_result,
-             test_more_floating_more_day_visitors, test_more_competition_fewer_visitors]
+             test_more_floating_more_day_visitors, test_more_competition_fewer_visitors,
+             test_interest_fades_over_time, test_repromo_never_hurts, test_higher_rent_later_breakeven]
     failed = 0
     for t in tests:
         try:

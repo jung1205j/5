@@ -335,9 +335,58 @@
       16602,
       21074,
       25581
+    ],
+    [
+      5064,
+      6674,
+      7421,
+      17946,
+      21392,
+      23625,
+      26007,
+      26457,
+      29828
+    ],
+    [
+      1146,
+      4966,
+      5089,
+      9942,
+      10495,
+      12486,
+      15586,
+      16773,
+      19404,
+      20491,
+      20879,
+      28069,
+      28819
+    ],
+    [
+      476,
+      2109,
+      5136,
+      12604,
+      13797,
+      14144,
+      15252,
+      18384,
+      25321,
+      28508,
+      28961
+    ],
+    [
+      6849,
+      7538,
+      12144,
+      13230,
+      15828,
+      16866,
+      22119,
+      23759
     ]
   ],
-  "visitors": 37,
+  "visitors": 41,
   "stopped_at": [
     {
       "group": "20대이하_자영업",
@@ -348,15 +397,87 @@
       "path": "당근"
     }
   ],
-  "visitors_demand": 43,
+  "visitors_demand": 47,
+  "visitors_range": [
+    41,
+    41
+  ],
+  "runs": 1,
   "competition_factor": 0.872,
   "daytime_share": 0.058,
   "day_seeds": 2,
   "population_in_radius": 861,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    4,
+    4,
+    4,
+    5,
+    6,
+    6,
+    6,
+    6,
+    6,
+    5
+  ],
+  "weekly_visits_model": [
+    1.627,
+    2.946,
+    3.561,
+    3.64,
+    4.34,
+    5.152,
+    5.997,
+    6.457,
+    6.231,
+    6.053,
+    5.607,
+    5.274
+  ],
+  "monthly_customers": 23,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 9,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      4,
+      4,
+      4,
+      5,
+      6,
+      6,
+      6,
+      7,
+      7,
+      6
+    ],
+    "without": [
+      2,
+      3,
+      4,
+      4,
+      4,
+      5,
+      6,
+      6,
+      6,
+      6,
+      6,
+      5
+    ],
+    "gain": 3
+  },
+  "assumptions": {
+    "avg_price": 7208,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

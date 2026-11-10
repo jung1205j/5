@@ -755,6 +755,15 @@
       29102,
       29436,
       29712
+    ],
+    [
+      5797,
+      11980,
+      25533
+    ],
+    [
+      11875,
+      20302
     ]
   ],
   "visitors": 68,
@@ -764,15 +773,87 @@
       "path": "동네"
     }
   ],
-  "visitors_demand": 105,
+  "visitors_demand": 106,
+  "visitors_range": [
+    68,
+    68
+  ],
+  "runs": 1,
   "competition_factor": 0.645,
   "daytime_share": 0.135,
   "day_seeds": 10,
   "population_in_radius": 1366,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    4,
+    5,
+    7,
+    11,
+    13,
+    13,
+    13,
+    11,
+    9,
+    7
+  ],
+  "weekly_visits_model": [
+    1.653,
+    2.921,
+    3.717,
+    5.104,
+    6.96,
+    10.517,
+    13.018,
+    13.283,
+    12.527,
+    11.329,
+    9.259,
+    7.483
+  ],
+  "monthly_customers": 40,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 8,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      11,
+      13,
+      13,
+      13,
+      11,
+      9,
+      8
+    ],
+    "without": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      11,
+      13,
+      13,
+      13,
+      11,
+      9,
+      7
+    ],
+    "gain": 1
+  },
+  "assumptions": {
+    "avg_price": 11592,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

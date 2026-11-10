@@ -581,24 +581,144 @@
       27176,
       27273,
       28188
+    ],
+    [
+      1293,
+      3148,
+      12070,
+      13735,
+      18496,
+      19515,
+      19917,
+      21186,
+      21579,
+      21683,
+      24255,
+      29773
+    ],
+    [
+      494,
+      1182,
+      8162,
+      10331,
+      15911,
+      16849,
+      19638,
+      24564,
+      28209,
+      28787,
+      29434
+    ],
+    [
+      1686,
+      2123,
+      2977,
+      4761,
+      10049,
+      12397,
+      13385,
+      20816,
+      22839,
+      23570,
+      27453
+    ],
+    [
+      9170,
+      11910,
+      14276,
+      20509,
+      27211,
+      29811
     ]
   ],
-  "visitors": 59,
+  "visitors": 62,
   "stopped_at": [
     {
       "group": "50대이상_자영업",
       "path": "맘카페"
     }
   ],
-  "visitors_demand": 76,
+  "visitors_demand": 80,
+  "visitors_range": [
+    62,
+    62
+  ],
+  "runs": 1,
   "competition_factor": 0.781,
   "daytime_share": 0.069,
   "day_seeds": 2,
   "population_in_radius": 1406,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    5,
+    6,
+    7,
+    7,
+    8,
+    9,
+    11,
+    11,
+    9,
+    8
+  ],
+  "weekly_visits_model": [
+    1.719,
+    2.949,
+    5.264,
+    6.294,
+    6.511,
+    7.309,
+    8.342,
+    9.47,
+    10.848,
+    10.508,
+    9.097,
+    7.712
+  ],
+  "monthly_customers": 39,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 10,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      5,
+      6,
+      7,
+      7,
+      8,
+      9,
+      11,
+      11,
+      10,
+      9
+    ],
+    "without": [
+      2,
+      3,
+      5,
+      6,
+      7,
+      7,
+      8,
+      9,
+      11,
+      11,
+      9,
+      8
+    ],
+    "gain": 2
+  },
+  "assumptions": {
+    "avg_price": 7951,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

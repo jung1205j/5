@@ -730,24 +730,115 @@
       11383,
       21378,
       29211
+    ],
+    [
+      114,
+      566,
+      1803,
+      16369
+    ],
+    [
+      14776,
+      20846,
+      26858
+    ],
+    [
+      20943,
+      23254,
+      29137
+    ],
+    [
+      28334
     ]
   ],
-  "visitors": 86,
+  "visitors": 87,
   "stopped_at": [
     {
       "group": "30대_자영업",
       "path": "인스타"
     }
   ],
-  "visitors_demand": 146,
+  "visitors_demand": 148,
+  "visitors_range": [
+    87,
+    87
+  ],
+  "runs": 1,
   "competition_factor": 0.589,
   "daytime_share": 0.232,
   "day_seeds": 15,
   "population_in_radius": 1369,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    4,
+    6,
+    10,
+    13,
+    17,
+    18,
+    16,
+    14,
+    12,
+    10,
+    8
+  ],
+  "weekly_visits_model": [
+    2.388,
+    3.856,
+    6.088,
+    10.085,
+    13.43,
+    17.318,
+    17.84,
+    15.935,
+    14.241,
+    11.858,
+    9.89,
+    8.252
+  ],
+  "monthly_customers": 44,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 7,
+    "count": 5,
+    "with": [
+      2,
+      4,
+      6,
+      10,
+      13,
+      17,
+      18,
+      17,
+      14,
+      12,
+      10,
+      9
+    ],
+    "without": [
+      2,
+      4,
+      6,
+      10,
+      13,
+      17,
+      18,
+      16,
+      14,
+      12,
+      10,
+      8
+    ],
+    "gain": 2
+  },
+  "assumptions": {
+    "avg_price": 7600,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

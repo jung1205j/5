@@ -538,19 +538,114 @@
       28464,
       28665,
       29376
+    ],
+    [
+      948,
+      5380,
+      5852,
+      9585,
+      15158,
+      18599,
+      19478,
+      20080,
+      20547,
+      23327,
+      25054
+    ],
+    [
+      9579,
+      10343,
+      19567,
+      19745,
+      27778
+    ],
+    [
+      13175
     ]
   ],
-  "visitors": 68,
+  "visitors": 70,
   "stopped_at": [],
-  "visitors_demand": 73,
+  "visitors_demand": 75,
+  "visitors_range": [
+    70,
+    70
+  ],
+  "runs": 1,
   "competition_factor": 0.933,
   "daytime_share": 0.11,
   "day_seeds": 9,
   "population_in_radius": 1086,
   "is_estimated": 1,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    4,
+    5,
+    7,
+    10,
+    11,
+    13,
+    13,
+    12,
+    10,
+    8
+  ],
+  "weekly_visits_model": [
+    2.253,
+    3.33,
+    3.938,
+    4.913,
+    7.015,
+    9.551,
+    11.431,
+    12.771,
+    13.129,
+    11.883,
+    10.11,
+    8.154
+  ],
+  "monthly_customers": 43,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 9,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      10,
+      11,
+      13,
+      13,
+      13,
+      11,
+      9
+    ],
+    "without": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      10,
+      11,
+      13,
+      13,
+      12,
+      10,
+      8
+    ],
+    "gain": 3
+  },
+  "assumptions": {
+    "avg_price": 8983,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

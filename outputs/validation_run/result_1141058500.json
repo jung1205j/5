@@ -136,9 +136,43 @@
     ],
     [
       23339
+    ],
+    [
+      4237,
+      10510,
+      28792
+    ],
+    [
+      4200,
+      5532,
+      21119,
+      22388,
+      26471
+    ],
+    [
+      1794,
+      11319,
+      12921,
+      13423,
+      15232,
+      18107,
+      21871,
+      25175
+    ],
+    [
+      1358,
+      2268,
+      5813,
+      7441,
+      8691,
+      9414,
+      9456,
+      12459,
+      21886,
+      22746
     ]
   ],
-  "visitors": 9,
+  "visitors": 11,
   "stopped_at": [
     {
       "group": "20대이하_직장인",
@@ -182,7 +216,7 @@
     },
     {
       "group": "50대이상_자영업",
-      "path": "맘카페"
+      "path": "당근"
     },
     {
       "group": "50대이상_주부",
@@ -193,15 +227,87 @@
       "path": "당근"
     }
   ],
-  "visitors_demand": 16,
+  "visitors_demand": 20,
+  "visitors_range": [
+    11,
+    11
+  ],
+  "runs": 1,
   "competition_factor": 0.549,
   "daytime_share": 0.108,
   "day_seeds": 3,
   "population_in_radius": 1795,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2
+  ],
+  "weekly_visits_model": [
+    1.098,
+    1.197,
+    1.121,
+    1.184,
+    1.134,
+    1.126,
+    1.079,
+    1.261,
+    1.31,
+    1.137,
+    1.145,
+    1.556
+  ],
+  "monthly_customers": 5,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 10,
+    "count": 5,
+    "with": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2
+    ],
+    "without": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "gain": 1
+  },
+  "assumptions": {
+    "avg_price": 7322,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

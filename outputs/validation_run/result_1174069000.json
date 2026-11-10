@@ -527,24 +527,121 @@
       26681,
       29148,
       29707
+    ],
+    [
+      2985,
+      5078,
+      6108,
+      6736,
+      8070,
+      12063,
+      14192,
+      15115,
+      20771,
+      21058
+    ],
+    [
+      7243,
+      8125,
+      19570,
+      25915,
+      28510
+    ],
+    [
+      6571
+    ],
+    [
+      28842
     ]
   ],
-  "visitors": 44,
+  "visitors": 46,
   "stopped_at": [
     {
       "group": "20대이하_자영업",
       "path": "당근"
     }
   ],
-  "visitors_demand": 47,
+  "visitors_demand": 49,
+  "visitors_range": [
+    46,
+    46
+  ],
+  "runs": 1,
   "competition_factor": 0.945,
   "daytime_share": 0.006,
   "day_seeds": 1,
   "population_in_radius": 1299,
   "is_estimated": 1,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    4,
+    4,
+    5,
+    7,
+    8,
+    8,
+    7,
+    7,
+    6,
+    5
+  ],
+  "weekly_visits_model": [
+    1.961,
+    2.952,
+    3.58,
+    4.229,
+    5.307,
+    7.389,
+    7.567,
+    7.764,
+    7.492,
+    6.856,
+    6.196,
+    5.216
+  ],
+  "monthly_customers": 25,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 9,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      4,
+      4,
+      5,
+      7,
+      8,
+      8,
+      7,
+      8,
+      7,
+      6
+    ],
+    "without": [
+      2,
+      3,
+      4,
+      4,
+      5,
+      7,
+      8,
+      8,
+      7,
+      7,
+      6,
+      5
+    ],
+    "gain": 3
+  },
+  "assumptions": {
+    "avg_price": 6065,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

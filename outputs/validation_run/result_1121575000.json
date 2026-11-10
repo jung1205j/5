@@ -738,28 +738,144 @@
       26585,
       28513,
       29510
+    ],
+    [
+      4034,
+      4079,
+      4531,
+      7424,
+      8044,
+      12457,
+      14154,
+      18065,
+      18092,
+      18351,
+      19446,
+      20446,
+      23130,
+      24904,
+      28166
+    ],
+    [
+      8623,
+      12096,
+      16220,
+      21049,
+      21194,
+      21970,
+      22175,
+      22180,
+      28431,
+      29549
+    ],
+    [
+      11407,
+      13173,
+      15537,
+      18115,
+      19259,
+      28700
+    ],
+    [
+      3598,
+      6977,
+      12555,
+      19544,
+      24338
     ]
   ],
-  "visitors": 72,
+  "visitors": 76,
   "stopped_at": [
     {
       "group": "30대_자영업",
-      "path": "동네"
+      "path": "인스타"
     },
     {
       "group": "50대이상_자영업",
       "path": "당근"
     }
   ],
-  "visitors_demand": 90,
+  "visitors_demand": 94,
+  "visitors_range": [
+    76,
+    76
+  ],
+  "runs": 1,
   "competition_factor": 0.8,
   "daytime_share": 0.05,
   "day_seeds": 2,
   "population_in_radius": 1597,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    4,
+    5,
+    7,
+    10,
+    12,
+    14,
+    14,
+    13,
+    11,
+    10,
+    8
+  ],
+  "weekly_visits_model": [
+    2.002,
+    3.78,
+    5.387,
+    7.488,
+    9.503,
+    12.388,
+    13.816,
+    13.727,
+    12.69,
+    10.806,
+    9.524,
+    8.209
+  ],
+  "monthly_customers": 42,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 8,
+    "count": 5,
+    "with": [
+      2,
+      4,
+      5,
+      7,
+      10,
+      12,
+      14,
+      14,
+      14,
+      12,
+      10,
+      8
+    ],
+    "without": [
+      2,
+      4,
+      5,
+      7,
+      10,
+      12,
+      14,
+      14,
+      13,
+      11,
+      10,
+      8
+    ],
+    "gain": 2
+  },
+  "assumptions": {
+    "avg_price": 8557,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

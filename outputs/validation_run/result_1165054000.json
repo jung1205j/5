@@ -579,28 +579,148 @@
       27401,
       28473,
       28717
+    ],
+    [
+      1793,
+      2431,
+      2722,
+      5962,
+      6934,
+      8645,
+      12064,
+      17316,
+      17756,
+      17909,
+      18595,
+      20842,
+      22017,
+      22397,
+      23259,
+      25439,
+      29588,
+      29848
+    ],
+    [
+      2019,
+      3957,
+      6590,
+      11623,
+      14009,
+      14798,
+      17438,
+      20727,
+      21204,
+      21919,
+      21977,
+      23286,
+      24388,
+      27462
+    ],
+    [
+      3526,
+      7432,
+      9363,
+      11112,
+      19852,
+      24854,
+      25495,
+      26234
+    ],
+    [
+      3499,
+      5245,
+      13717,
+      19770
     ]
   ],
-  "visitors": 58,
+  "visitors": 64,
   "stopped_at": [
     {
       "group": "20대이하_자영업",
       "path": "동네"
-    },
-    {
-      "group": "40대_자영업",
-      "path": "인스타"
     }
   ],
-  "visitors_demand": 76,
+  "visitors_demand": 84,
+  "visitors_range": [
+    64,
+    64
+  ],
+  "runs": 1,
   "competition_factor": 0.763,
   "daytime_share": 0.096,
   "day_seeds": 5,
   "population_in_radius": 1210,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    3,
+    4,
+    5,
+    6,
+    7,
+    10,
+    11,
+    12,
+    11,
+    9
+  ],
+  "weekly_visits_model": [
+    1.904,
+    2.689,
+    3.172,
+    3.679,
+    4.665,
+    5.789,
+    7.288,
+    9.601,
+    11.08,
+    11.851,
+    11.09,
+    9.39
+  ],
+  "monthly_customers": 43,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 10,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      3,
+      4,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12,
+      12,
+      10
+    ],
+    "without": [
+      2,
+      3,
+      3,
+      4,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12,
+      11,
+      9
+    ],
+    "gain": 2
+  },
+  "assumptions": {
+    "avg_price": 7730,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

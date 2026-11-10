@@ -708,28 +708,132 @@
       20522,
       23633,
       29233
+    ],
+    [
+      4177,
+      4205,
+      7375,
+      18666,
+      24503,
+      26824,
+      28646
+    ],
+    [
+      3770,
+      10073,
+      10680,
+      17419,
+      22148,
+      26131
+    ],
+    [
+      10158,
+      10343,
+      15336,
+      19411,
+      27399,
+      28067
+    ],
+    [
+      1151,
+      6371,
+      6853,
+      12992,
+      26298
     ]
   ],
-  "visitors": 89,
+  "visitors": 92,
   "stopped_at": [
     {
       "group": "20대이하_자영업",
-      "path": "당근"
+      "path": "인스타"
     },
     {
       "group": "30대_자영업",
       "path": "인스타"
     }
   ],
-  "visitors_demand": 100,
+  "visitors_demand": 105,
+  "visitors_range": [
+    92,
+    92
+  ],
+  "runs": 1,
   "competition_factor": 0.884,
   "daytime_share": 0.081,
   "day_seeds": 5,
   "population_in_radius": 1428,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    6,
+    10,
+    13,
+    16,
+    17,
+    16,
+    15,
+    13,
+    11,
+    10,
+    9
+  ],
+  "weekly_visits_model": [
+    2.444,
+    6.031,
+    9.937,
+    13.493,
+    16.223,
+    17.187,
+    16.145,
+    14.731,
+    12.855,
+    11.404,
+    10.061,
+    8.867
+  ],
+  "monthly_customers": 43,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 7,
+    "count": 5,
+    "with": [
+      2,
+      6,
+      10,
+      13,
+      16,
+      17,
+      16,
+      16,
+      15,
+      13,
+      11,
+      9
+    ],
+    "without": [
+      2,
+      6,
+      10,
+      13,
+      16,
+      17,
+      16,
+      15,
+      13,
+      11,
+      10,
+      9
+    ],
+    "gain": 6
+  },
+  "assumptions": {
+    "avg_price": 7099,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

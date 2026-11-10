@@ -484,9 +484,39 @@
       18942,
       20252,
       23355
+    ],
+    [
+      4232,
+      7543,
+      10155,
+      21182,
+      22310,
+      28048,
+      29342
+    ],
+    [
+      7343,
+      14468,
+      17100,
+      21039,
+      23544
+    ],
+    [
+      4052,
+      5296,
+      5303,
+      21937,
+      23309,
+      27942
+    ],
+    [
+      5165,
+      11959,
+      17341,
+      21133
     ]
   ],
-  "visitors": 42,
+  "visitors": 43,
   "stopped_at": [
     {
       "group": "30대_자영업",
@@ -497,15 +527,87 @@
       "path": "동네"
     }
   ],
-  "visitors_demand": 47,
+  "visitors_demand": 49,
+  "visitors_range": [
+    43,
+    43
+  ],
+  "runs": 1,
   "competition_factor": 0.886,
   "daytime_share": 0.04,
   "day_seeds": 1,
   "population_in_radius": 1134,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8,
+    7,
+    6,
+    5,
+    5
+  ],
+  "weekly_visits_model": [
+    1.58,
+    2.999,
+    3.926,
+    5.133,
+    6.082,
+    6.704,
+    7.539,
+    7.511,
+    6.728,
+    5.946,
+    5.222,
+    4.531
+  ],
+  "monthly_customers": 23,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 8,
+    "count": 5,
+    "with": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      8,
+      8,
+      7,
+      6,
+      5
+    ],
+    "without": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      8,
+      7,
+      6,
+      5,
+      5
+    ],
+    "gain": 3
+  },
+  "assumptions": {
+    "avg_price": 5146,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

@@ -126,9 +126,31 @@
       16945,
       18325,
       20197
+    ],
+    [
+      7358,
+      16124,
+      19507
+    ],
+    [
+      11711,
+      19472,
+      28981
+    ],
+    [
+      9110,
+      9370,
+      15096
+    ],
+    [
+      12390,
+      23676,
+      25593,
+      28121,
+      28851
     ]
   ],
-  "visitors": 8,
+  "visitors": 9,
   "stopped_at": [
     {
       "group": "20대이하_자영업",
@@ -152,23 +174,19 @@
     },
     {
       "group": "30대_직장인",
-      "path": "맘카페"
+      "path": "인스타"
     },
     {
       "group": "40대_기타",
-      "path": "인스타"
+      "path": "동네"
     },
     {
       "group": "40대_자영업",
       "path": "맘카페"
     },
     {
-      "group": "40대_주부",
-      "path": "동네"
-    },
-    {
       "group": "40대_직장인",
-      "path": "맘카페"
+      "path": "인스타"
     },
     {
       "group": "50대이상_기타",
@@ -180,22 +198,94 @@
     },
     {
       "group": "50대이상_주부",
-      "path": "동네"
+      "path": "당근"
     },
     {
       "group": "50대이상_직장인",
       "path": "맘카페"
     }
   ],
-  "visitors_demand": 9,
+  "visitors_demand": 11,
+  "visitors_range": [
+    9,
+    9
+  ],
+  "runs": 1,
   "competition_factor": 0.83,
   "daytime_share": 0.03,
   "day_seeds": 1,
   "population_in_radius": 1640,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "weekly_visits_model": [
+    1.125,
+    1.467,
+    1.315,
+    1.411,
+    1.235,
+    1.136,
+    1.017,
+    0.924,
+    0.866,
+    0.85,
+    0.78,
+    0.97
+  ],
+  "monthly_customers": 4,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 4,
+    "count": 5,
+    "with": [
+      1,
+      1,
+      1,
+      1,
+      3,
+      3,
+      2,
+      2,
+      2,
+      3,
+      4,
+      5
+    ],
+    "without": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "gain": 16
+  },
+  "assumptions": {
+    "avg_price": 6863,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,

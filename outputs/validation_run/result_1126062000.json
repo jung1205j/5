@@ -755,24 +755,144 @@
       25972,
       27483,
       29289
+    ],
+    [
+      159,
+      252,
+      3245,
+      5331,
+      6752,
+      10920,
+      12185,
+      12605,
+      13284,
+      14593,
+      14826,
+      15026,
+      15459,
+      16406,
+      20793,
+      23803,
+      23980,
+      25093,
+      28345,
+      29888
+    ],
+    [
+      1891,
+      2993,
+      3438,
+      4044,
+      5209,
+      7785,
+      8486,
+      14286,
+      16437,
+      22956,
+      23102,
+      25297
+    ],
+    [
+      2636,
+      5383,
+      27746,
+      28732
+    ],
+    [
+      8281,
+      15037,
+      19519,
+      20241
     ]
   ],
-  "visitors": 77,
+  "visitors": 81,
   "stopped_at": [
     {
       "group": "30대_자영업",
       "path": "인스타"
     }
   ],
-  "visitors_demand": 95,
+  "visitors_demand": 99,
+  "visitors_range": [
+    81,
+    81
+  ],
+  "runs": 1,
   "competition_factor": 0.81,
   "daytime_share": 0.072,
   "day_seeds": 2,
   "population_in_radius": 1564,
   "is_estimated": 0,
-  "weekly_visitors": null,
+  "weekly_visitors": [
+    2,
+    4,
+    4,
+    6,
+    10,
+    13,
+    14,
+    14,
+    14,
+    13,
+    11,
+    9
+  ],
+  "weekly_visits_model": [
+    1.959,
+    3.504,
+    4.486,
+    6.478,
+    9.929,
+    12.587,
+    14.229,
+    14.192,
+    13.589,
+    12.531,
+    11.138,
+    9.333
+  ],
+  "monthly_customers": 47,
   "breakeven_week": null,
-  "repromo": null,
+  "repromo": {
+    "week": 10,
+    "count": 5,
+    "with": [
+      2,
+      4,
+      4,
+      6,
+      10,
+      13,
+      14,
+      14,
+      14,
+      13,
+      12,
+      10
+    ],
+    "without": [
+      2,
+      4,
+      4,
+      6,
+      10,
+      13,
+      14,
+      14,
+      14,
+      13,
+      11,
+      9
+    ],
+    "gain": 2
+  },
+  "assumptions": {
+    "avg_price": 6481,
+    "rent": null,
+    "gross_margin": 0.6,
+    "other_fixed_monthly": 5000000,
+    "customer_scale": 1.0
+  },
   "channel_share": null,
   "hubs": null,
   "scenarios": null,
