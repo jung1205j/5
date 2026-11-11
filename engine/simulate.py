@@ -228,23 +228,52 @@ def coin(seed, a, b):
     return x / 2 ** 64
 
 
-def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None, ctx=None, seed_channel=None):
+def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None, ctx=None, seed_channel=None, promo=None):
     """한 주에 steps_per_week 단계. 소식이 닿는 경로는 세 가지.
     - 입소문: 새로 들은 사람은 연결된 사람마다 한 번씩 전할 기회 (경로 = 관계망 type)
     - 검색: 아직 모르는 사람이 매 단계 검색으로 발견. 집단의 검색 성향 x 관심도 x 지금까지 쌓인 후기 수
     - 지나가다: 가게 근처에 살거나 낮에 그 동을 지나는 사람이 매 단계 가게를 직접 발견. 집단의 '지나가다' 성향 x 영업시간 유동인구
     extra_at={단계: [id,...]} 이면 그 단계에 추가 홍보로 소식을 직접 들은 사람을 더함.
+    promo (홍보 시나리오, 선택): {"pre": [(id, 경로)], "pre_steps": n, "at": {단계: [(id, 경로)]},
+                                  "share": {id: 전달 의향}, "reviews": {단계: 추가 후기}}
+      - pre: 오픈 전에 미리 알게 된 사람. pre_steps 단계 동안 입소문만 돌고(가게가 아직 없으니 검색·지나가다 없음) 0주차로 기록
+      - at: 그 단계에 홍보로 직접 알게 된 사람, share: 허브 쿠폰처럼 전달 의향이 올라간 사람, reviews: 체험단 후기
     반환: steps, heard_week{id: 주차}, fails, channel{id: 경로}, parent{id: 전해준 사람}"""
     ctx = ctx or {}
-    informed = set(seeds)
-    heard_week = {i: 0 for i in seeds}
-    channel = {i: (seed_channel or {}).get(i, "지나가다") for i in seeds}
-    parent = {}
-    steps = [sorted(seeds)]
+    promo = promo or {}
+    if promo.get("share"):
+        share = {**share, **promo["share"]}
+    informed, heard_week, channel, parent = set(), {}, {}, {}
     fails = Counter()
-    frontier = sorted(seeds)
     scale = w.get("transmission_scale", 1.0)
-    extra_at = extra_at or {}
+
+    # 오픈 전 홍보: 입소문만 미리 돈다
+    pre = [(i, ch) for i, ch in promo.get("pre", []) if i not in informed]
+    frontier = []
+    for i, ch in pre:
+        informed.add(i); heard_week[i] = 0; channel[i] = ch
+        frontier.append(i)
+    for _ in range(promo.get("pre_steps", 0) if pre else 0):
+        new = []
+        for s in sorted(frontier):
+            for r, path in sorted(adj[s]):
+                # 오픈 전엔 가게를 직접 겪은 사람이 없어서 전달력이 약함 (pre_share_factor)
+                if r not in informed and coin(seed, s, r) < (scale * share[s] * interest[r] * w["path_weight"][path]
+                                                             * w.get("promo", {}).get("pre_share_factor", 1.0)):
+                    informed.add(r); heard_week[r] = 0; channel[r] = path; parent[r] = s
+                    new.append(r)
+        frontier = new
+
+    # 오픈: 원래 출발점 + 오픈 전에 알게 된 사람 중 아직 안 전한 사람
+    for i in seeds:
+        if i not in informed:
+            informed.add(i); heard_week[i] = 0; channel[i] = (seed_channel or {}).get(i, "지나가다")
+    frontier = sorted(set(frontier) | set(seeds))
+    steps = [sorted(informed)]
+    extra_at = {k: [x if isinstance(x, tuple) else (x, "추가홍보") for x in v] for k, v in (extra_at or {}).items()}
+    for k, v in promo.get("at", {}).items():
+        extra_at.setdefault(k, []).extend(v)
+    review_extra = 0.0
     spw = w.get("steps_per_week", 1)
     max_steps = w["horizon_weeks"] * spw
     d = w["interest_decay"]
@@ -270,7 +299,8 @@ def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None, c
             # 지금까지 쌓인 후기 (모델 단위): 소식 들은 사람들의 누적 첫 방문 기댓값 x 후기 작성률
             week = step / spw
             visits = sum(vprob.get(i, 0) * (1 - d ** max(week - h, 0)) for i, h in heard_week.items())
-            reviews = w.get("review_rate", 0) * visits
+            review_extra += promo.get("reviews", {}).get(step, 0.0)
+            reviews = w.get("review_rate", 0) * visits + review_extra
             review_f = reviews / (reviews + w.get("review_half", 1)) if reviews > 0 else 0.0
             for i in candidates:
                 if i in informed:
@@ -287,11 +317,11 @@ def spread(people, adj, seeds, share, interest, w, seed, by_id, extra_at=None, c
                 informed.add(i)
                 new.append(i)
                 channel[i] = ch
-        for r in extra_at.get(step, []):
+        for r, ch in extra_at.get(step, []):
             if r not in informed:
                 informed.add(r)
                 new.append(r)
-                channel[r] = "추가홍보"
+                channel[r] = ch
         if not new and not candidates and not any(k > step for k in extra_at):
             break
         new = sorted(set(new))
@@ -320,10 +350,12 @@ def find_hubs(heard_week, parent, people_by_id, reactions, top):
     return out
 
 
-def weekly_visits(heard_week, visit_prob, revisit, w):
+def weekly_visits(heard_week, visit_prob, revisit, w, boost=None):
     """주별 방문 (모델 단위, 기댓값)
     - 첫 방문: 소식을 들은 주부터 관심이 매주 interest_decay 비율로 식으며 나눠서 방문 (합 = visit_prob)
-    - 재방문: 첫 방문한 사람이 이후 매주 revisit 확률로 다시 오고, 그 확률도 revisit_retention 비율로 줄어듦"""
+    - 재방문: 첫 방문한 사람이 이후 매주 revisit 확률로 다시 오고, 그 확률도 revisit_retention 비율로 줄어듦
+    - boost=(주차 집합, {id: 배수}): 오픈 할인 기간에 첫 방문이 그 배수만큼 늘어남"""
+    b_weeks, b_mult = boost if boost else (set(), {})
     weeks = w["horizon_weeks"]
     d = w["interest_decay"]
     first = [0.0] * weeks
@@ -335,6 +367,8 @@ def weekly_visits(heard_week, visit_prob, revisit, w):
         r0 = revisit.get(i, 0.0)
         for t in range(h, weeks):
             f = v * (1 - d) * d ** (t - h)
+            if t in b_weeks:
+                f *= b_mult.get(i, 1.0)
             first[t] += f
             for u in range(t + 1, weeks):  # 그 주에 처음 온 사람들의 이후 재방문
                 repeat[u] += f * r0 * w["revisit_retention"] ** (u - t - 1)
@@ -521,6 +555,19 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
     channel_total = {ch: round(n / sum(tot.values()), 3) for ch, n in tot.most_common()}
     hubs = find_hubs(main["heard_week"], main["parent"], by_id, reactions, w["hub_top"])
 
+    # 홍보 시나리오·예산 배분 (후보 동 모드에서만)
+    promo_out = {}
+    if sc.get("_promo", False):
+        import promo as promo_mod
+        model = {"people": people, "by_id": by_id, "adj": adj, "share": share, "interest": interest,
+                 "w": w, "ctx": ctx, "visit_prob": visit_prob, "revisit": revisit, "rows": rows,
+                 "main": main, "reactions": reactions, "dist": dist, "stall_week": rw,
+                 "price": price, "rent": rent, "cscale": cscale, "baseline_real": weekly_real,
+                 "budget": sc.get("budget") or w["promo"]["default_budget"], "spread": spread,
+                 "weekly_visits": weekly_visits, "breakeven": breakeven, "find_hubs": find_hubs,
+                 "stopped_at": None, "dong_code": dong_code}
+        promo_out = promo_mod.plan(model)
+
     mean = lambda xs: sum(xs) / len(xs)
     return {"dong_code": dong_code, "dong": dong, "seed": main["seed"], "steps": main["steps"],
             "visitors": int(round(mean([r["visitors"] for r in rows]))),
@@ -548,7 +595,8 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
                             "other_fixed_monthly": w.get("other_fixed_monthly", 0),
                             "customer_scale": w.get("customer_scale", 1.0)},
             "channel_share": channel_share, "channel_total": channel_total, "hubs": hubs,
-            "scenarios": None, "budget_plan": None,
+            "scenarios": promo_out.get("scenarios"), "budget_plan": promo_out.get("budget_plan"),
+            "hub_vs_broad": promo_out.get("hub_vs_broad"), "prescriptions": promo_out.get("prescriptions"),
             "diagnosis": None}
 
 
@@ -561,6 +609,7 @@ def main():
     ap.add_argument("--all-dongs", action="store_true", help="페르소나에 있는 모든 동 계산 (검증용)")
     ap.add_argument("--dongs", nargs="*", help="계산할 동 코드 목록")
     ap.add_argument("--out", default=None, help="결과 저장 폴더 (기본: --data와 같은 폴더)")
+    ap.add_argument("--no-promo", action="store_true", help="홍보 시나리오·예산 계산 건너뛰기")
     ap.add_argument("--runs", type=int, default=None, help="시드 몇 개를 돌려 평균낼지 (기본: 후보 5, 전체 동 1)")
     args = ap.parse_args()
 
@@ -571,6 +620,11 @@ def main():
     stats = load_dong_stats(folder)
     geo = load_json(folder / "dongs.geojson") if (folder / "dongs.geojson").exists() else None
     scenario = load_json(folder / "scenario.json") if (folder / "scenario.json").exists() else {}
+    scenario["_promo"] = not args.all_dongs and not args.no_promo
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import promo as _promo_mod
+    _promo_mod.AD_COSTS = load_json(folder / "ad_costs.json") if (folder / "ad_costs.json").exists() else []
     runs = args.runs or (1 if args.all_dongs else w.get("runs", 5))
     out_dir = ROOT / args.out if args.out else folder
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -608,6 +662,14 @@ def main():
               f"방문 가능 {res['visitors']}명 (범위 {res['visitors_range'][0]}~{res['visitors_range'][1]}, 수요 {res['visitors_demand']}) / "
               f"3달째 월 손님 {res['monthly_customers']}명 / 손익분기 {res['breakeven_week'] or '-'}주차 / "
               f"{res['repromo']['week']}주차 추가 홍보 시 +{res['repromo']['gain']}명 / 멈춘 집단 {len(res['stopped_at'])}개")
+        bp = res.get("budget_plan")
+        if bp:
+            hv = res["hub_vs_broad"]
+            print(f"   홍보 {bp['budget']:,}원 추천: {bp['split']} {bp['timing']}{' + 오픈 할인' if bp['open_discount'] else ''} "
+                  f"-> 12주 +{bp['visitors_gain']}명 (만 원당 {bp['per_10k']}명, 광고비의 {bp['roas']}배 매출, {bp['payback_week'] or '-'}주 만에 회수, "
+                  f"손익분기 {bp['breakeven_without'] or '-'} -> {bp['breakeven_with'] or '-'}주차, "
+                  f"단가 바뀌어도 1순위 유지 {int(bp['robust']['same_top_share'] * 100)}%) / "
+                  f"허브 1명은 평균 {hv['reach_hub']}명, 인스타로 안 사람은 {hv['reach_broad']}명에게 퍼뜨림 ({hv['per_person_ratio']}배)")
 
     if all_edges:
         with open(out_dir / "edges.json", "w", encoding="utf-8") as f:

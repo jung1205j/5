@@ -1,5 +1,5 @@
 {
-  "version": "weights_v6",
+  "version": "weights_v7",
   "neighbor_radius_m": 500,
   "neighbor_max": 8,
   "path_weight": {
@@ -55,5 +55,39 @@
   "review_half": 5,
   "walk_base": 0.15,
   "walk_distance_scale_m": 400,
-  "hub_top": 5
+  "hub_top": 5,
+  "promo": {
+    "default_budget": 1000000,
+    "runs": 3,
+    "pre_open_weeks": 1,
+    "insta_frequency": 3,
+    "notice": {
+      "인스타": 0.05,
+      "당근": 1.0,
+      "맘카페": 0.1,
+      "체험단": 0.05
+    },
+    "response_default": 0.3,
+    "response_mean": 0.5,
+    "dangn_radius_m": 1500,
+    "cafe_members": 10000,
+    "banner_view_rate": 0.3,
+    "max_months": 3,
+    "post_reach": 1000,
+    "review_per_post": 0.5,
+    "coupon_cost": 20000,
+    "hub_share_boost": 0.3,
+    "hub_pool": 300,
+    "discount_rate": 0.2,
+    "discount_weeks": 2,
+    "discount_boost": 0.5,
+    "step_frac": 0.05,
+    "robust_threshold": 0.8,
+    "hub_compare_budget": 500000,
+    "presc_interest_min": 0.4,
+    "presc_aware_ratio": 0.8,
+    "effect_scale": 0.15,
+    "hub_compare_min": 5,
+    "pre_share_factor": 0.3
+  }
 }

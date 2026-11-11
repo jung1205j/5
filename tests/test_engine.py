@@ -1,4 +1,4 @@
-"""확산 엔진 동작 검증 테스트 (상식 테스트 13개)
+"""확산 엔진 동작 검증 테스트 (상식 테스트 15개)
 
 실행 (저장소 맨 위에서):  python tests/test_engine.py
 pytest가 있으면:          pytest tests/test_engine.py
@@ -115,10 +115,10 @@ def test_more_floating_more_day_visitors():
 
 
 def test_more_competition_fewer_visitors():
-    """6) 같은 수요라도 근처 경쟁 점포가 많으면 방문 가능 고객이 줄어든다"""
+    """6) 근처 경쟁 점포가 많으면 방문 가능 고객이 줄어든다 (손님이 줄면 후기·검색도 줄어 수요까지 함께 줄 수 있음)"""
     few = run_with_stats(make_stats(stores=20))
     many = run_with_stats(make_stats(stores=500))
-    assert few["visitors_demand"] == many["visitors_demand"], "테스트 전제(같은 수요)가 깨짐"
+    assert many["competition_factor"] < few["competition_factor"], "경쟁 계수가 줄지 않음"
     assert many["visitors"] < few["visitors"], f"경쟁 적음 {few['visitors']}명, 많음 {many['visitors']}명"
 
 
@@ -192,13 +192,51 @@ def test_hub_reach_consistent():
     assert all(h["reach"] >= h["direct"] >= 1 for h in hubs), f"reach/direct 이상 {hubs}"
 
 
+def load_promo():
+    import importlib.util
+    sys.path.insert(0, str(ROOT / "engine"))
+    spec = importlib.util.spec_from_file_location("promo", ROOT / "engine" / "promo.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_budget_diminishing_and_split():
+    """14) 예산 배분: 돈을 늘릴수록 추가 효과는 줄고(오목), 효과가 가파른 채널에 먼저 쓰며, 예산을 넘지 않는다"""
+    pm = load_promo()
+    steep = pm.concave_curve([(250, 100), (500, 160), (1000, 200)])
+    flat = pm.concave_curve([(250, 30), (500, 60), (1000, 110)])
+    slopes = [sl for _, sl in steep]
+    assert all(a >= b for a, b in zip(slopes, slopes[1:])), f"기울기가 줄지 않음 {slopes}"
+    alloc = pm.allocate({"A": steep, "B": flat}, 1000, 50)
+    # A의 가파른 구간(0~500)을 먼저 다 쓰고, A가 완만해지는 지점부터 B로 넘어가야 함
+    assert sum(alloc.values()) <= 1000 and alloc["A"] >= 500 and alloc["B"] > 0, f"배분 {alloc}"
+
+
+def test_prescription_matches_reason():
+    """15) 관심은 있는데 소식이 덜 닿은 '가격' 거절 집단에는 가격 관련 제안이 나온다"""
+    pm = load_promo()
+    react = {"30대_주부": {"interest": 4, "reason_type": "가격", "community": ["맘카페"],
+                         "promo_response": {"오픈할인": 0.9, "지인추천": 0.5, "체험단후기": 0.3},
+                         "price_max": {"5천이하": 0.6, "5천~7천": 0.4}},
+             "20대이하_학생": {"interest": 4, "reason_type": "시간", "community": ["인스타"],
+                          "promo_response": {"인스타광고": 0.8}}}
+    by_id = {i: {"group": "30대_주부" if i < 20 else "20대이하_학생"} for i in range(40)}
+    heard = {i: 0 for i in range(5)} | {i: 0 for i in range(20, 40)}   # 주부는 5/20만 앎
+    m = {"reactions": react, "by_id": by_id, "main": {"heard_week": heard},
+         "w": {"promo": {"presc_interest_min": 0.4, "presc_aware_ratio": 0.8}}}
+    out = pm.prescriptions(m)
+    assert out and out[0]["group"] == "30대_주부" and out[0]["channel"] == "오픈이벤트" and "가격" in out[0]["offer"], out
+
+
 if __name__ == "__main__":
     tests = [test_no_interest_no_spread, test_more_interest_more_spread,
              test_farther_store_fewer_visitors, test_same_seed_same_result,
              test_more_floating_more_day_visitors, test_more_competition_fewer_visitors,
              test_interest_fades_over_time, test_repromo_never_hurts, test_higher_rent_later_breakeven,
              test_evening_hours_favor_night_dong, test_closed_days_fewer_customers,
-             test_no_reviews_little_search, test_hub_reach_consistent]
+             test_no_reviews_little_search, test_hub_reach_consistent,
+             test_budget_diminishing_and_split, test_prescription_matches_reason]
     failed = 0
     for t in tests:
         try:

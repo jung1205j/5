@@ -828,7 +828,7 @@
   },
   "assumptions": {
     "avg_price": 7798,
-    "rent": null,
+    "rent": 3000000,
     "gross_margin": 0.6,
     "other_fixed_monthly": 5000000,
     "customer_scale": 32.05
@@ -1002,7 +1002,277 @@
       ]
     }
   ],
-  "scenarios": null,
-  "budget_plan": null,
+  "scenarios": [
+    {
+      "name": "인스타",
+      "timing": "오픈주",
+      "cost": 1000000,
+      "visitors_gain": 6,
+      "per_10k": 0.06,
+      "roas": 0.05,
+      "by_timing": {
+        "오픈전": 2,
+        "오픈주": 3,
+        "정체기": 2
+      },
+      "curve": [
+        [
+          250000,
+          0
+        ],
+        [
+          500000,
+          3
+        ],
+        [
+          1000000,
+          6
+        ]
+      ]
+    },
+    {
+      "name": "당근",
+      "timing": "오픈주",
+      "cost": 1000000,
+      "visitors_gain": 177,
+      "per_10k": 1.77,
+      "roas": 1.38,
+      "by_timing": {
+        "오픈전": 14,
+        "오픈주": 108,
+        "정체기": 17
+      },
+      "curve": [
+        [
+          250000,
+          46
+        ],
+        [
+          500000,
+          108
+        ],
+        [
+          1000000,
+          177
+        ]
+      ]
+    },
+    {
+      "name": "맘카페",
+      "timing": "오픈주",
+      "cost": 1000000,
+      "visitors_gain": 36,
+      "per_10k": 0.36,
+      "roas": 0.28,
+      "by_timing": {
+        "오픈전": 23,
+        "오픈주": 35,
+        "정체기": 8
+      },
+      "curve": [
+        [
+          250000,
+          33
+        ],
+        [
+          500000,
+          35
+        ],
+        [
+          1000000,
+          36
+        ]
+      ]
+    },
+    {
+      "name": "체험단",
+      "timing": "오픈전",
+      "cost": 1000000,
+      "visitors_gain": 106,
+      "per_10k": 1.06,
+      "roas": 0.83,
+      "by_timing": {
+        "오픈전": 35,
+        "오픈주": 33,
+        "정체기": 4
+      },
+      "curve": [
+        [
+          250000,
+          19
+        ],
+        [
+          500000,
+          35
+        ],
+        [
+          1000000,
+          106
+        ]
+      ]
+    },
+    {
+      "name": "허브쿠폰",
+      "timing": "오픈주",
+      "cost": 1000000,
+      "visitors_gain": 20,
+      "per_10k": 0.2,
+      "roas": 0.16,
+      "by_timing": {
+        "오픈전": 7,
+        "오픈주": 20,
+        "정체기": 8
+      },
+      "curve": [
+        [
+          250000,
+          0
+        ],
+        [
+          500000,
+          20
+        ],
+        [
+          1000000,
+          20
+        ]
+      ]
+    },
+    {
+      "name": "오픈이벤트",
+      "timing": "오픈주",
+      "cost": 296854,
+      "visitors_gain": 117,
+      "per_10k": 3.95,
+      "note": "첫 2주 20% 할인, 비용 = 할인해준 금액"
+    }
+  ],
+  "budget_plan": {
+    "budget": 1000000,
+    "spent": 948790,
+    "split": {
+      "당근": 550000
+    },
+    "timing": {
+      "당근": "오픈주"
+    },
+    "open_discount": true,
+    "discount_cost": 398790,
+    "visitors_gain": 267,
+    "per_10k": 2.82,
+    "roas": 2.2,
+    "payback_week": 4,
+    "breakeven_without": null,
+    "breakeven_with": null,
+    "weekly_with": [
+      83,
+      173,
+      195,
+      253,
+      295,
+      306,
+      303,
+      297,
+      285,
+      273,
+      258,
+      242
+    ],
+    "weekly_without": [
+      44,
+      90,
+      146,
+      209,
+      261,
+      284,
+      292,
+      297,
+      289,
+      277,
+      261,
+      246
+    ],
+    "robust": {
+      "top_channel": "당근",
+      "same_top_share": 0.5,
+      "stable": false
+    },
+    "assumption_note": "노출당 주목률·쿠폰 효과·할인 효과는 가정값 (weights.json promo)"
+  },
+  "hub_vs_broad": {
+    "budget": 500000,
+    "hub_coupons": 25,
+    "hub_gain": 20,
+    "broad_channel": "인스타",
+    "broad_gain": 3,
+    "ratio": 6.11,
+    "broad_people": 35,
+    "reach_hub": 8.0,
+    "reach_broad": 1.12,
+    "per_person_ratio": 7.12,
+    "per_person_note": "한 명이 소식을 퍼뜨린 평균 인원 (허브 상위 vs 인스타 이용자 평균)",
+    "hub_examples": [
+      {
+        "id": 14323,
+        "group": "40대_기타",
+        "dong": "망원1동",
+        "reach": 10,
+        "direct": 3,
+        "week": 0,
+        "community": [
+          "맘카페",
+          "당근",
+          "인스타"
+        ]
+      },
+      {
+        "id": 7807,
+        "group": "40대_직장인",
+        "dong": "망원2동",
+        "reach": 8,
+        "direct": 2,
+        "week": 2,
+        "community": [
+          "맘카페",
+          "당근",
+          "인스타"
+        ]
+      },
+      {
+        "id": 23423,
+        "group": "30대_직장인",
+        "dong": "당산2동",
+        "reach": 8,
+        "direct": 3,
+        "week": 4,
+        "community": [
+          "당근",
+          "인스타"
+        ]
+      }
+    ]
+  },
+  "prescriptions": [
+    {
+      "group": "50대이상_주부",
+      "awareness": 0.402,
+      "overall_awareness": 0.525,
+      "interest": 3.09,
+      "reason_type": "가격",
+      "channel": "오픈이벤트",
+      "response": 0.798,
+      "offer": "오픈 할인이나 가격대 조정 (가장 많이 고른 가격대: 7천~1만)"
+    },
+    {
+      "group": "50대이상_기타",
+      "awareness": 0.415,
+      "overall_awareness": 0.525,
+      "interest": 2.92,
+      "reason_type": "가격",
+      "channel": "오픈이벤트",
+      "response": 0.781,
+      "offer": "오픈 할인이나 가격대 조정 (가장 많이 고른 가격대: 5천~7천)"
+    }
+  ],
   "diagnosis": null
 }
