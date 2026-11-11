@@ -16,7 +16,19 @@
       "당근커뮤니티": -2.806
     },
     "breakeven_achieved_all_dongs": 198,
-    "survival_validation": "보류: 생존율 데이터 없음",
+    "survival_validation": {
+      "region": "마포구",
+      "matched_dongs": 16,
+      "bep_achieved_dongs": 7,
+      "bep_null_dongs": 9,
+      "mean_survival_bep_achieved_pct": 91.24,
+      "mean_survival_bep_null_pct": 87.42,
+      "difference_pp": 3.82,
+      "spearman_rho_bep_week_vs_survival": -0.1416,
+      "p_value": 0.761998,
+      "spearman_n": 7,
+      "interpretation": "손익분기 도달 그룹의 평균 생존율이 3.82%p 높았으나, 손익분기 주차와 생존율의 상관관계는 통계적으로 유의하지 않음. null 9개 동의 원인은 추가 확인 필요."
+    },
     "mismatch": [
       "지나가다 채널 비율 차이 -12.12%p"
     ],
