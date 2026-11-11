@@ -1,4 +1,4 @@
-"""확산 엔진 동작 검증 테스트 (상식 테스트 15개)
+"""확산 엔진 동작 검증 테스트 (상식 테스트 16개)
 
 실행 (저장소 맨 위에서):  python tests/test_engine.py
 pytest가 있으면:          pytest tests/test_engine.py
@@ -229,6 +229,17 @@ def test_prescription_matches_reason():
     assert out and out[0]["group"] == "30대_주부" and out[0]["channel"] == "오픈이벤트" and "가격" in out[0]["offer"], out
 
 
+def test_open_calibration_reduces_error():
+    """16) 오픈 후 앞 4주 실제 손님으로 보정하면 남은 주 예측 오차가 줄어든다 (가상 실제 손님 50번 평균)"""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("open_calibrate", ROOT / "engine" / "open_calibrate.py")
+    oc = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(oc)
+    pred = [30, 60, 95, 120, 135, 140, 138, 130, 120, 110, 100, 92]
+    res = oc.demo({"dong_code": "x", "dong": "테스트동", "weekly_visitors": pred}, load_weights(), trials=50)
+    assert res["mae_after"] < res["mae_before"] and res["improved_share"] >= 0.7, res
+
+
 if __name__ == "__main__":
     tests = [test_no_interest_no_spread, test_more_interest_more_spread,
              test_farther_store_fewer_visitors, test_same_seed_same_result,
@@ -236,7 +247,8 @@ if __name__ == "__main__":
              test_interest_fades_over_time, test_repromo_never_hurts, test_higher_rent_later_breakeven,
              test_evening_hours_favor_night_dong, test_closed_days_fewer_customers,
              test_no_reviews_little_search, test_hub_reach_consistent,
-             test_budget_diminishing_and_split, test_prescription_matches_reason]
+             test_budget_diminishing_and_split, test_prescription_matches_reason,
+             test_open_calibration_reduces_error]
     failed = 0
     for t in tests:
         try:
