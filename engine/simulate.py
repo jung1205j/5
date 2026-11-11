@@ -555,6 +555,13 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
     channel_total = {ch: round(n / sum(tot.values()), 3) for ch, n in tot.most_common()}
     hubs = find_hubs(main["heard_week"], main["parent"], by_id, reactions, w["hub_top"])
 
+    # 집단별 인지율: 반경 안 그 집단 시민 중 12주 안에 소식을 들은 비율 (모든 실행 평균)
+    g_total = Counter(p["group"] for p in people)
+    group_awareness = {}
+    for g in sorted(g_total):
+        ids = [p["id"] for p in people if p["group"] == g]
+        group_awareness[g] = round(sum(sum(i in r["heard_week"] for i in ids) for r in rows) / (len(ids) * runs), 3)
+
     # 홍보 시나리오·예산 배분 (후보 동 모드에서만)
     promo_out = {}
     if sc.get("_promo", False):
@@ -595,6 +602,7 @@ def simulate(dong_code, dong, people, edges, reactions, geo, w, seed, stats=None
                             "other_fixed_monthly": w.get("other_fixed_monthly", 0),
                             "customer_scale": w.get("customer_scale", 1.0)},
             "channel_share": channel_share, "channel_total": channel_total, "hubs": hubs,
+            "group_awareness": group_awareness,
             "scenarios": promo_out.get("scenarios"), "budget_plan": promo_out.get("budget_plan"),
             "hub_vs_broad": promo_out.get("hub_vs_broad"), "prescriptions": promo_out.get("prescriptions"),
             "diagnosis": None}
