@@ -1,0 +1,39 @@
+[
+  {
+    "round": 2,
+    "date": "2026-11-11",
+    "target": "서울 전체 413개 동 (is_estimated 제외)",
+    "metric": "visitors_demand",
+    "seed_runs": 5,
+    "rank_corr": 0.2503,
+    "group_a_corr": 0.3348,
+    "group_b_corr": 0.1679,
+    "channel_validation_dongs": 395,
+    "channel_gap_pp": {
+      "네이버검색": -6.3304,
+      "인스타": -4.7081,
+      "지나가다": -12.1244,
+      "당근커뮤니티": -2.806
+    },
+    "breakeven_achieved_all_dongs": 198,
+    "survival_validation": {
+      "region": "마포구",
+      "matched_dongs": 16,
+      "bep_achieved_dongs": 7,
+      "bep_null_dongs": 9,
+      "mean_survival_bep_achieved_pct": 91.24,
+      "mean_survival_bep_null_pct": 87.42,
+      "difference_pp": 3.82,
+      "spearman_rho_bep_week_vs_survival": -0.1416,
+      "p_value": 0.761998,
+      "spearman_n": 7,
+      "interpretation": "손익분기 도달 7개 동의 평균 생존율은 91.24%, 미도달 9개 동은 87.42%로 차이는 3.82%p. 다만 손익분기 도달 주차와 실제 생존율의 상관관계는 통계적으로 유의하지 않음(rho=-0.1416, p=0.762).",
+      "bep_not_achieved_dongs": 9,
+      "bep_null_reason": "9개 동 모두 입력값 누락이 아닌 12주 시뮬레이션 내 손익분기 미도달로 확인"
+    },
+    "mismatch": [
+      "지나가다 채널 비율 차이 -12.12%p"
+    ],
+    "next": "생존율 데이터 확보, 채널 정의 및 가중치 점검, 그룹별 성능 차이 재검증"
+  }
+]
